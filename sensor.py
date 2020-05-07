@@ -2,9 +2,10 @@
 import logging
 
 from . import (
-    SENSOR_TYPES,
     TYPE_SENSOR,
     DOMAIN,
+    DATA_STATION,
+    SENSOR_TYPES,
     EcowittEntity,
 )
 
@@ -20,28 +21,26 @@ async def async_setup_platform(hass, config, async_add_entities,
 
     entities = []
     for sensor in discovery_info:
-        name, uom, kind, device_class, icon = SENSOR_TYPES[sensor]
+        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
         if kind == TYPE_SENSOR:
             entities.append(
                 EcowittSensor(
                     hass,
                     sensor,
                     name,
-                    hass.data[DOMAIN][DATA_STATION],
                     device_class,
                     uom,
                     icon,
                 )
             )
-
     async_add_entities(entities, True)
 
 
 class EcowittSensor(EcowittEntity):
 
-    def __init__(self, hass, key, name, stationinfo, dc, uom, icon):
+    def __init__(self, hass, key, name, dc, uom, icon):
         """Initialize the sensor."""
-        super().__init__(hass, key, name, stationinfo)
+        super().__init__(hass, key, name)
         self._icon = icon
         self._uom = uom
         self._dc = dc

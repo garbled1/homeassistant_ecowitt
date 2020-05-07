@@ -3,7 +3,12 @@ import asyncio
 import logging
 import time
 
-from pyecowitt import EcoWittListener
+from pyecowitt import (
+    EcoWittListener,
+    WINDCHILL_OLD,
+    WINDCHILL_NEW,
+    WINDCHILL_HYBRID,
+)
 import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
@@ -19,12 +24,21 @@ from homeassistant.const import (
     DEGREE,
     EVENT_HOMEASSISTANT_STOP,
     CONF_PORT,
+    CONF_UNIT_SYSTEM_METRIC,
+    CONF_UNIT_SYSTEM_IMPERIAL,
     POWER_WATT,
     TEMP_CELSIUS,
     UNIT_PERCENTAGE,
     PRESSURE_HPA,
+    PRESSURE_INHG,
     LENGTH_INCHES,
     SPEED_KILOMETERS_PER_HOUR,
+    SPEED_MILES_PER_HOUR,
+    TIME_HOURS,
+    TIME_DAYS,
+    TIME_WEEKS,
+    TIME_MONTHS,
+    TIME_YEARS,
     UV_INDEX,
     DEVICE_CLASS_HUMIDITY,
     DEVICE_CLASS_ILLUMINANCE,
@@ -44,19 +58,34 @@ DATA_STATIONTYPE = "stationtype"
 DATA_FREQ = "freq"
 DATA_MODEL = "model"
 
+CONF_UNIT_BARO = "barounit"
+CONF_UNIT_WIND = "windunit"
+CONF_UNIT_RAIN = "rainunit"
+CONF_UNIT_WINDCHILL = "windchillunit"
+
 TYPE_BAROMABSHPA = "baromabshpa"
 TYPE_BAROMRELHPA = "baromrelhpa"
+TYPE_BAROMABSIN = "baromabsin"
+TYPE_BAROMRELIN = "baromrelin"
 TYPE_RAINRATEIN = "rainratein"
 TYPE_EVENTRAININ = "eventrainin"
 TYPE_DAILYRAININ = "dailyrainin"
 TYPE_WEEKLYRAININ = "weeklyrainin"
 TYPE_MONTHLYRAININ = "monthlyrainin"
 TYPE_YEARLYRAININ = "yearlyrainin"
+TYPE_RAINRATEMM = "rainratemm"
+TYPE_EVENTRAINMM = "eventrainmm"
+TYPE_DAILYRAINMM = "dailyrainmm"
+TYPE_WEEKLYRAINMM = "weeklyrainmm"
+TYPE_MONTHLYRAINMM = "monthlyrainmm"
+TYPE_YEARLYRAINMM = "yearlyrainmm"
 TYPE_HUMIDITY = "humidity"
 TYPE_HUMIDITYIN = "humidityin"
 TYPE_WINDDIR = "winddir"
 TYPE_WINDSPEEDKMH = "windspeedkmh"
 TYPE_WINDGUSTKMH = "windgustkmh"
+TYPE_WINDSPEEDMPH = "windspeedmph"
+TYPE_WINDGUSTMPH = "windgustmph"
 TYPE_TEMPC = "tempc"
 TYPE_TEMPINC = "tempinc"
 TYPE_TEMP1C = "temp1c"
@@ -67,55 +96,86 @@ TYPE_WINDCHILLC = "windchillc"
 TYPE_SOLARRADIATION = "solarradiation"
 TYPE_UV = "uv"
 
-# Name, unit_of_measure, type, device_class, icon
-# name, uom, kind, device_class, icon = SENSOR_TYPES[x]
+S_METRIC = 1
+S_IMPERIAL = 2
+
+W_TYPE_NEW = "new"
+W_TYPE_OLD = "old"
+W_TYPE_HYBRID = "hybrid"
+
+# Name, unit_of_measure, type, device_class, icon, metric=1
+# name, uom, kind, device_class, icon, metric = SENSOR_TYPES[x]
 SENSOR_TYPES = {
     TYPE_BAROMABSHPA: ("Absolute Pressure", PRESSURE_HPA,
-                       TYPE_SENSOR, DEVICE_CLASS_PRESSURE, "mdi:gauge"),
+                       TYPE_SENSOR, DEVICE_CLASS_PRESSURE,
+                       "mdi:gauge", S_METRIC),
     TYPE_BAROMRELHPA: ("Relative Pressure", PRESSURE_HPA,
-                       TYPE_SENSOR, DEVICE_CLASS_PRESSURE, "mdi:gauge"),
-    TYPE_RAINRATEIN: ("Rain Rate", LENGTH_INCHES,
-                      TYPE_SENSOR, None, "mdi:water"),
-    TYPE_EVENTRAININ: ("Event Rain Rate", LENGTH_INCHES,
-                       TYPE_SENSOR, None, "mdi:water"),
-    TYPE_DAILYRAININ: ("Daily Rain Rate", LENGTH_INCHES,
-                       TYPE_SENSOR, None, "mdi:water"),
-    TYPE_WEEKLYRAININ: ("Weekly Rain Rate", LENGTH_INCHES,
-                        TYPE_SENSOR, None, "mdi:water"),
-    TYPE_MONTHLYRAININ: ("Monthly Rain Rate", LENGTH_INCHES,
-                         TYPE_SENSOR, None, "mdi:water"),
-    TYPE_YEARLYRAININ: ("Yearly Rain Rate", LENGTH_INCHES,
-                        TYPE_SENSOR, None, "mdi:water"),
+                       TYPE_SENSOR, DEVICE_CLASS_PRESSURE,
+                       "mdi:gauge", S_METRIC),
+    TYPE_BAROMABSIN: ("Absolute Pressure", PRESSURE_INHG,
+                       TYPE_SENSOR, DEVICE_CLASS_PRESSURE,
+                      "mdi:gauge", S_IMPERIAL),
+    TYPE_BAROMRELIN: ("Relative Pressure", PRESSURE_INHG,
+                       TYPE_SENSOR, DEVICE_CLASS_PRESSURE,
+                      "mdi:gauge", S_IMPERIAL),
+    TYPE_RAINRATEIN: ("Rain Rate", f"{LENGTH_INCHES}/{TIME_HOURS}",
+                      TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
+    TYPE_EVENTRAININ: ("Event Rain Rate", f"{LENGTH_INCHES}/{TIME_HOURS}",
+                       TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
+    TYPE_DAILYRAININ: ("Daily Rain Rate", f"{LENGTH_INCHES}/{TIME_DAYS}",
+                       TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
+    TYPE_WEEKLYRAININ: ("Weekly Rain Rate", f"{LENGTH_INCHES}/{TIME_WEEKS}",
+                        TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
+    TYPE_MONTHLYRAININ: ("Monthly Rain Rate", f"{LENGTH_INCHES}/{TIME_MONTHS}",
+                         TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
+    TYPE_YEARLYRAININ: ("Yearly Rain Rate", f"{LENGTH_INCHES}/{TIME_YEARS}",
+                        TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
+    TYPE_RAINRATEMM: ("Rain Rate", f"mm/{TIME_HOURS}",
+                      TYPE_SENSOR, None, "mdi:water", S_METRIC),
+    TYPE_EVENTRAINMM: ("Event Rain Rate", f"mm/{TIME_HOURS}",
+                       TYPE_SENSOR, None, "mdi:water", S_METRIC),
+    TYPE_DAILYRAINMM: ("Daily Rain Rate", f"mm/{TIME_DAYS}",
+                       TYPE_SENSOR, None, "mdi:water", S_METRIC),
+    TYPE_WEEKLYRAINMM: ("Weekly Rain Rate", f"mm/{TIME_WEEKS}",
+                        TYPE_SENSOR, None, "mdi:water", S_METRIC),
+    TYPE_MONTHLYRAINMM: ("Monthly Rain Rate", f"mm/{TIME_MONTHS}",
+                         TYPE_SENSOR, None, "mdi:water", S_METRIC),
+    TYPE_YEARLYRAINMM: ("Yearly Rain Rate", f"mm/{TIME_YEARS}",
+                        TYPE_SENSOR, None, "mdi:water", S_METRIC),
     TYPE_HUMIDITY: ("Humidity", UNIT_PERCENTAGE,
-                    TYPE_SENSOR, DEVICE_CLASS_HUMIDITY, "mdi:water-percent"),
+                    TYPE_SENSOR, DEVICE_CLASS_HUMIDITY, "mdi:water-percent", 0),
     TYPE_HUMIDITYIN: ("Indoor Humidity", UNIT_PERCENTAGE,
-                      TYPE_SENSOR, DEVICE_CLASS_HUMIDITY, "mdi:water-percent"),
+                      TYPE_SENSOR, DEVICE_CLASS_HUMIDITY, "mdi:water-percent", 0),
     TYPE_WINDDIR: ("Wind Direction", DEGREE,
-                   TYPE_SENSOR, None, "mdi:water-percent"),
+                   TYPE_SENSOR, None, "mdi:water-percent", 0),
     TYPE_WINDSPEEDKMH: ("Wind Speed", SPEED_KILOMETERS_PER_HOUR,
-                        TYPE_SENSOR, None, "mdi:weather-windy"),
+                        TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC),
     TYPE_WINDGUSTKMH: ("Wind Gust", SPEED_KILOMETERS_PER_HOUR,
-                       TYPE_SENSOR, None, "mdi:weather-windy"),
+                       TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC),
+    TYPE_WINDSPEEDMPH: ("Wind Speed", SPEED_MILES_PER_HOUR,
+                        TYPE_SENSOR, None, "mdi:weather-windy", S_IMPERIAL),
+    TYPE_WINDGUSTMPH: ("Wind Gust", SPEED_MILES_PER_HOUR,
+                       TYPE_SENSOR, None, "mdi:weather-windy", S_IMPERIAL),
     TYPE_TEMPC: ("Outdoor Temperature", TEMP_CELSIUS,
-                 TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer"),
+                 TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
     TYPE_TEMP1C: ("Temperature 1", TEMP_CELSIUS,
-                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer"),
+                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
     TYPE_TEMP2C: ("Temperature 2", TEMP_CELSIUS,
-                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer"),
+                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
     TYPE_TEMP3C: ("Temperature 3", TEMP_CELSIUS,
-                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer"),
+                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
     TYPE_TEMPINC: ("Indoor Temperature", TEMP_CELSIUS,
-                   TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer"),
+                   TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
     TYPE_DEWPOINTC: ("Dewpoint", TEMP_CELSIUS,
-                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer"),
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
     TYPE_WINDCHILLC: ("Windchill", TEMP_CELSIUS,
                       TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
-                      "mdi:thermometer"),
+                      "mdi:thermometer", 0),
     TYPE_SOLARRADIATION: ("Solar Radiation", f"{POWER_WATT}/m^2",
                           TYPE_SENSOR, DEVICE_CLASS_ILLUMINANCE,
-                          "mdi:weather-sunny"),
+                          "mdi:weather-sunny", 0),
     TYPE_UV: ("UV Index", UV_INDEX,
-              TYPE_SENSOR, None, "mdi:sunglasses"),
+              TYPE_SENSOR, None, "mdi:sunglasses", 0),
 }
 
 IGNORED_SENSORS = [
@@ -124,25 +184,22 @@ IGNORED_SENSORS = [
     'temp1f',
     'temp2f',
     'temp3f',
-    'baromrelin',
-    'baromabsin',
     'dateutc',
-    'windspeedmph',
-    'windgustmph',
-    'rainratein',
-    'eventrainin',
-    'dailyrainin',
-    'weeklyrainin',
-    'monthlyrainin',
-    'yearlyrainin',
     'windgustms',
+    'windspeedms',
     'windchillf',
     'dewpointf',
 ]
 
-
 COMPONENT_SCHEMA = vol.Schema(
-    {vol.Required(CONF_PORT): cv.port}
+    {
+        vol.Required(CONF_PORT): cv.port,
+        vol.Optional(CONF_UNIT_BARO, default=CONF_UNIT_SYSTEM_METRIC): cv.string,
+        vol.Optional(CONF_UNIT_WIND, default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
+        vol.Optional(CONF_UNIT_RAIN, default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
+        vol.Optional(CONF_UNIT_WINDCHILL,
+                     default=W_TYPE_HYBRID): cv.string,
+    }
 )
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: COMPONENT_SCHEMA}, extra=vol.ALLOW_EXTRA)
@@ -173,7 +230,14 @@ async def async_setup(hass: HomeAssistant, config):
     ws = EcoWittListener(port=conf[CONF_PORT])
     hass.data[DOMAIN][DATA_ECOWITT] = ws
 
-    hass.async_create_task(ws.start())
+    if conf[CONF_UNIT_WINDCHILL] == W_TYPE_OLD:
+        ws.set_windchill(WINDCHILL_OLD)
+    if conf[CONF_UNIT_WINDCHILL] == W_TYPE_NEW:
+        ws.set_windchill(WINDCHILL_NEW)
+    if conf[CONF_UNIT_WINDCHILL] == W_TYPE_HYBRID:
+        ws.set_windchill(WINDCHILL_HYBRID)
+
+    hass.loop.create_task(ws.listen())
 
     async def close_server(*args):
         """ Close the ecowitt server."""
@@ -207,7 +271,32 @@ async def async_setup(hass: HomeAssistant, config):
             if sensor not in IGNORED_SENSORS:
                 _LOGGER.warning("Unhandled sensor type %s", sensor)
             continue
-        all_sensors.append(SENSOR_TYPES[sensor])
+
+        # Is this a metric or imperial sensor, lookup and skip
+        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
+        if "baro" in sensor:
+            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL and
+                metric == S_METRIC):
+                continue
+            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC and
+                metric == S_IMPERIAL):
+                continue
+        if "rain" in sensor:
+            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL and
+                metric == S_METRIC):
+                continue
+            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC and
+                metric == S_IMPERIAL):
+                continue
+        if "wind" in sensor:
+            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL and
+                metric == S_METRIC):
+                continue
+            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC and
+                metric == S_IMPERIAL):
+                continue
+
+        all_sensors.append(sensor)
 
     if not all_sensors:
         _LOGGER.error("No sensors found to monitor, check device config.")
@@ -216,7 +305,6 @@ async def async_setup(hass: HomeAssistant, config):
     hass.async_create_task(
         async_load_platform(hass, "sensor", DOMAIN, all_sensors, config)
     )
-
     async def _async_ecowitt_update_cb(weather_data):
         """Primary update callback called from pyecowitt."""
         _LOGGER.debug("Primary update callback triggered.")
@@ -230,12 +318,12 @@ async def async_setup(hass: HomeAssistant, config):
 class EcowittEntity(Entity):
     """Base class for Ecowitt Weather Station."""
 
-    def __init(self, hass, key, name, stationinfo):
+    def __init__(self, hass, key, name):
         """Construct the entity."""
         self.hass = hass
         self._key = key
         self._name = name
-        self._stationinfo = stationinfo
+        self._stationinfo = hass.data[DOMAIN][DATA_STATION]
         self._ws = hass.data[DOMAIN][DATA_ECOWITT]
 
     @property
@@ -246,12 +334,21 @@ class EcowittEntity(Entity):
     @property
     def unique_id(self):
         """Return a unique ID for this sensor."""
-        return f"{self._stationinfo[DATA_PASSKEY]}-{self._sensor_type}-{self._key}"
+        return f"{self._stationinfo[DATA_PASSKEY]}-{self._key}"
 
     @property
     def name(self):
         """Return the name of the sensor."""
         return self._name
+
+    @property
+    def device_info(self):
+        """Return device information for this sensor."""
+        return {
+            "station": self._stationinfo[DATA_STATIONTYPE],
+            "model": self._stationinfo[DATA_MODEL],
+            "frequency": self._stationinfo[DATA_FREQ],
+        }
 
     async def async_added_to_hass(self):
         """Setup a listener for the entity."""
