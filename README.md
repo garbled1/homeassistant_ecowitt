@@ -2,14 +2,13 @@
 Ecowitt driver for homeassistant
 
 ## Configuration:
-``
-ecowitt:
-  port: 4199
-  barounit: metric
-  windunit: imperial
-  rainunit: imperial
-  windchillunit: hybrid
-``
+
+    ecowitt:
+      port: 4199
+      barounit: metric
+      windunit: imperial
+      rainunit: imperial
+      windchillunit: hybrid
 
 Windchill can be one of "hybrid", "old", or "new".  Defaults for units are
 as shown above.  The only mandatory "option" is "port".
