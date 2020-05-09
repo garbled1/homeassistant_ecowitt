@@ -2,5 +2,5 @@
     "name": "Ecowitt Weather Station",
     "render_readme": true,
     "domains": ["sensor"],
-    "iot_class": "Local Push",
+    "iot_class": "Local Push"
 }
