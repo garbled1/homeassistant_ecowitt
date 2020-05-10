@@ -52,6 +52,8 @@ class EcowittSensor(EcowittEntity):
         """Return the state of the sensor."""
         if self._key in self._ws.last_values:
             return self._ws.last_values[self._key]
+        _LOGGER.warning("Sensor %s not in last update, check range or battery",
+                        self._key)
         return STATE_UNKNOWN
 
     @property
