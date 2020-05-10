@@ -95,6 +95,16 @@ TYPE_DEWPOINTC = "dewpointc"
 TYPE_WINDCHILLC = "windchillc"
 TYPE_SOLARRADIATION = "solarradiation"
 TYPE_UV = "uv"
+TYPE_SOILMOISTURE1 = "soilmoisture1"
+TYPE_SOILMOISTURE2 = "soilmoisture2"
+TYPE_SOILMOISTURE3 = "soilmoisture3"
+TYPE_SOILMOISTURE4 = "soilmoisture4"
+TYPE_SOILMOISTURE5 = "soilmoisture5"
+TYPE_SOILMOISTURE6 = "soilmoisture6"
+TYPE_SOILMOISTURE7 = "soilmoisture7"
+TYPE_SOILMOISTURE8 = "soilmoisture8"
+TYPE_SOILMOISTURE9 = "soilmoisture9"
+TYPE_SOILMOISTURE10 = "soilmoisture10"
 
 S_METRIC = 1
 S_IMPERIAL = 2
@@ -113,10 +123,10 @@ SENSOR_TYPES = {
                        TYPE_SENSOR, DEVICE_CLASS_PRESSURE,
                        "mdi:gauge", S_METRIC),
     TYPE_BAROMABSIN: ("Absolute Pressure", PRESSURE_INHG,
-                       TYPE_SENSOR, DEVICE_CLASS_PRESSURE,
+                      TYPE_SENSOR, DEVICE_CLASS_PRESSURE,
                       "mdi:gauge", S_IMPERIAL),
     TYPE_BAROMRELIN: ("Relative Pressure", PRESSURE_INHG,
-                       TYPE_SENSOR, DEVICE_CLASS_PRESSURE,
+                      TYPE_SENSOR, DEVICE_CLASS_PRESSURE,
                       "mdi:gauge", S_IMPERIAL),
     TYPE_RAINRATEIN: ("Rain Rate", f"{LENGTH_INCHES}/{TIME_HOURS}",
                       TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
@@ -143,9 +153,11 @@ SENSOR_TYPES = {
     TYPE_YEARLYRAINMM: ("Yearly Rain Rate", f"mm/{TIME_YEARS}",
                         TYPE_SENSOR, None, "mdi:water", S_METRIC),
     TYPE_HUMIDITY: ("Humidity", UNIT_PERCENTAGE,
-                    TYPE_SENSOR, DEVICE_CLASS_HUMIDITY, "mdi:water-percent", 0),
+                    TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                    "mdi:water-percent", 0),
     TYPE_HUMIDITYIN: ("Indoor Humidity", UNIT_PERCENTAGE,
-                      TYPE_SENSOR, DEVICE_CLASS_HUMIDITY, "mdi:water-percent", 0),
+                      TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                      "mdi:water-percent", 0),
     TYPE_WINDDIR: ("Wind Direction", DEGREE,
                    TYPE_SENSOR, None, "mdi:water-percent", 0),
     TYPE_WINDSPEEDKMH: ("Wind Speed", SPEED_KILOMETERS_PER_HOUR,
@@ -165,9 +177,11 @@ SENSOR_TYPES = {
     TYPE_TEMP3C: ("Temperature 3", TEMP_CELSIUS,
                   TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
     TYPE_TEMPINC: ("Indoor Temperature", TEMP_CELSIUS,
-                   TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+                   TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                   "mdi:thermometer", 0),
     TYPE_DEWPOINTC: ("Dewpoint", TEMP_CELSIUS,
-                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                     "mdi:thermometer", 0),
     TYPE_WINDCHILLC: ("Windchill", TEMP_CELSIUS,
                       TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
                       "mdi:thermometer", 0),
@@ -176,6 +190,36 @@ SENSOR_TYPES = {
                           "mdi:weather-sunny", 0),
     TYPE_UV: ("UV Index", UV_INDEX,
               TYPE_SENSOR, None, "mdi:sunglasses", 0),
+    TYPE_SOILMOISTURE1: ("Soil Moisture 1", UNIT_PERCENTAGE,
+                         TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                         "mdi:water-percent", 0),
+    TYPE_SOILMOISTURE2: ("Soil Moisture 2", UNIT_PERCENTAGE,
+                         TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                         "mdi:water-percent", 0),
+    TYPE_SOILMOISTURE3: ("Soil Moisture 3", UNIT_PERCENTAGE,
+                         TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                         "mdi:water-percent", 0),
+    TYPE_SOILMOISTURE4: ("Soil Moisture 4", UNIT_PERCENTAGE,
+                         TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                         "mdi:water-percent", 0),
+    TYPE_SOILMOISTURE5: ("Soil Moisture 5", UNIT_PERCENTAGE,
+                         TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                         "mdi:water-percent", 0),
+    TYPE_SOILMOISTURE6: ("Soil Moisture 6", UNIT_PERCENTAGE,
+                         TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                         "mdi:water-percent", 0),
+    TYPE_SOILMOISTURE7: ("Soil Moisture 7", UNIT_PERCENTAGE,
+                         TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                         "mdi:water-percent", 0),
+    TYPE_SOILMOISTURE8: ("Soil Moisture 8", UNIT_PERCENTAGE,
+                         TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                         "mdi:water-percent", 0),
+    TYPE_SOILMOISTURE9: ("Soil Moisture 9", UNIT_PERCENTAGE,
+                         TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                         "mdi:water-percent", 0),
+    TYPE_SOILMOISTURE10: ("Soil Moisture 10", UNIT_PERCENTAGE,
+                          TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                          "mdi:water-percent", 0),
 }
 
 IGNORED_SENSORS = [
@@ -194,9 +238,12 @@ IGNORED_SENSORS = [
 COMPONENT_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_PORT): cv.port,
-        vol.Optional(CONF_UNIT_BARO, default=CONF_UNIT_SYSTEM_METRIC): cv.string,
-        vol.Optional(CONF_UNIT_WIND, default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
-        vol.Optional(CONF_UNIT_RAIN, default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
+        vol.Optional(CONF_UNIT_BARO,
+                     default=CONF_UNIT_SYSTEM_METRIC): cv.string,
+        vol.Optional(CONF_UNIT_WIND,
+                     default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
+        vol.Optional(CONF_UNIT_RAIN,
+                     default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
         vol.Optional(CONF_UNIT_WINDCHILL,
                      default=W_TYPE_HYBRID): cv.string,
     }
@@ -276,24 +323,24 @@ async def async_setup(hass: HomeAssistant, config):
         name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
         if "baro" in sensor:
             if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL and
-                metric == S_METRIC):
+                    metric == S_METRIC):
                 continue
             if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC and
-                metric == S_IMPERIAL):
+                    metric == S_IMPERIAL):
                 continue
         if "rain" in sensor:
             if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL and
-                metric == S_METRIC):
+                    metric == S_METRIC):
                 continue
             if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC and
-                metric == S_IMPERIAL):
+                    metric == S_IMPERIAL):
                 continue
         if "wind" in sensor:
             if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL and
-                metric == S_METRIC):
+                    metric == S_METRIC):
                 continue
             if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC and
-                metric == S_IMPERIAL):
+                    metric == S_IMPERIAL):
                 continue
 
         all_sensors.append(sensor)
@@ -305,6 +352,7 @@ async def async_setup(hass: HomeAssistant, config):
     hass.async_create_task(
         async_load_platform(hass, "sensor", DOMAIN, all_sensors, config)
     )
+
     async def _async_ecowitt_update_cb(weather_data):
         """Primary update callback called from pyecowitt."""
         _LOGGER.debug("Primary update callback triggered.")
