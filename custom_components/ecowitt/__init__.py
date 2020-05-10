@@ -233,6 +233,10 @@ IGNORED_SENSORS = [
     'windspeedms',
     'windchillf',
     'dewpointf',
+    DATA_PASSKEY,
+    DATA_STATIONTYPE,
+    DATA_FREQ,
+    DATA_MODEL,
 ]
 
 COMPONENT_SCHEMA = vol.Schema(
