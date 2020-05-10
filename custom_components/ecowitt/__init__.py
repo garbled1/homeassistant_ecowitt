@@ -356,6 +356,11 @@ async def async_setup(hass: HomeAssistant, config):
     async def _async_ecowitt_update_cb(weather_data):
         """Primary update callback called from pyecowitt."""
         _LOGGER.debug("Primary update callback triggered.")
+        for sensor in weather_data.keys():
+            if sensor not in SENSOR_TYPES:
+                if sensor not in IGNORED_SENSORS:
+                    _LOGGER.warning("Unhandled sensor type %s value %s, " +
+                                    "file a PR.", sensor, weather_data[sensor])
         async_dispatcher_send(hass, DOMAIN)
 
     ws.register_listener(_async_ecowitt_update_cb)
