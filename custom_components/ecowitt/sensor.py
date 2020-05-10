@@ -9,6 +9,8 @@ from . import (
     EcowittEntity,
 )
 
+from homeassistant.const import STATE_UNKNOWN
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -48,7 +50,9 @@ class EcowittSensor(EcowittEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        return self._ws.last_values[self._key]
+        if self._key in self._ws.last_values:
+            return self._ws.last_values[self._key]
+        return STATE_UNKNOWN
 
     @property
     def unit_of_measurement(self):
