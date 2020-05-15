@@ -26,6 +26,7 @@ from homeassistant.const import (
     CONF_PORT,
     CONF_UNIT_SYSTEM_METRIC,
     CONF_UNIT_SYSTEM_IMPERIAL,
+    CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
     POWER_WATT,
     TEMP_CELSIUS,
     UNIT_PERCENTAGE,
@@ -80,6 +81,14 @@ TYPE_WEEKLYRAINMM = "weeklyrainmm"
 TYPE_MONTHLYRAINMM = "monthlyrainmm"
 TYPE_YEARLYRAINMM = "yearlyrainmm"
 TYPE_HUMIDITY = "humidity"
+TYPE_HUMIDITY1 = "humidity1"
+TYPE_HUMIDITY2 = "humidity2"
+TYPE_HUMIDITY3 = "humidity3"
+TYPE_HUMIDITY4 = "humidity4"
+TYPE_HUMIDITY5 = "humidity5"
+TYPE_HUMIDITY6 = "humidity6"
+TYPE_HUMIDITY7 = "humidity7"
+TYPE_HUMIDITY8 = "humidity8"
 TYPE_HUMIDITYIN = "humidityin"
 TYPE_WINDDIR = "winddir"
 TYPE_WINDSPEEDKMH = "windspeedkmh"
@@ -91,6 +100,11 @@ TYPE_TEMPINC = "tempinc"
 TYPE_TEMP1C = "temp1c"
 TYPE_TEMP2C = "temp2c"
 TYPE_TEMP3C = "temp3c"
+TYPE_TEMP4C = "temp4c"
+TYPE_TEMP5C = "temp5c"
+TYPE_TEMP6C = "temp6c"
+TYPE_TEMP7C = "temp7c"
+TYPE_TEMP8C = "temp8c"
 TYPE_DEWPOINTC = "dewpointc"
 TYPE_WINDCHILLC = "windchillc"
 TYPE_SOLARRADIATION = "solarradiation"
@@ -103,8 +117,14 @@ TYPE_SOILMOISTURE5 = "soilmoisture5"
 TYPE_SOILMOISTURE6 = "soilmoisture6"
 TYPE_SOILMOISTURE7 = "soilmoisture7"
 TYPE_SOILMOISTURE8 = "soilmoisture8"
-TYPE_SOILMOISTURE9 = "soilmoisture9"
-TYPE_SOILMOISTURE10 = "soilmoisture10"
+TYPE_PM25_CH1 = "pm25_ch1"
+TYPE_PM25_CH2 = "pm25_ch2"
+TYPE_PM25_CH3 = "pm25_ch3"
+TYPE_PM25_CH4 = "pm25_ch4"
+TYPE_PM25_AVG_24H_CH1 = "pm25_avg_24h_ch1"
+TYPE_PM25_AVG_24H_CH2 = "pm25_avg_24h_ch2"
+TYPE_PM25_AVG_24H_CH3 = "pm25_avg_24h_ch3"
+TYPE_PM25_AVG_24H_CH4 = "pm25_avg_24h_ch4"
 
 S_METRIC = 1
 S_IMPERIAL = 2
@@ -158,6 +178,30 @@ SENSOR_TYPES = {
     TYPE_HUMIDITYIN: ("Indoor Humidity", UNIT_PERCENTAGE,
                       TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
                       "mdi:water-percent", 0),
+    TYPE_HUMIDITY1: ("Humidity 1", UNIT_PERCENTAGE,
+                     TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                     "mdi:water-percent", 0),
+    TYPE_HUMIDITY2: ("Humidity 2", UNIT_PERCENTAGE,
+                     TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                     "mdi:water-percent", 0),
+    TYPE_HUMIDITY3: ("Humidity 3", UNIT_PERCENTAGE,
+                     TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                     "mdi:water-percent", 0),
+    TYPE_HUMIDITY4: ("Humidity 4", UNIT_PERCENTAGE,
+                     TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                     "mdi:water-percent", 0),
+    TYPE_HUMIDITY5: ("Humidity 5", UNIT_PERCENTAGE,
+                     TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                     "mdi:water-percent", 0),
+    TYPE_HUMIDITY6: ("Humidity 6", UNIT_PERCENTAGE,
+                     TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                     "mdi:water-percent", 0),
+    TYPE_HUMIDITY7: ("Humidity 7", UNIT_PERCENTAGE,
+                     TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                     "mdi:water-percent", 0),
+    TYPE_HUMIDITY8: ("Humidity 8", UNIT_PERCENTAGE,
+                     TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                     "mdi:water-percent", 0),
     TYPE_WINDDIR: ("Wind Direction", DEGREE,
                    TYPE_SENSOR, None, "mdi:water-percent", 0),
     TYPE_WINDSPEEDKMH: ("Wind Speed", SPEED_KILOMETERS_PER_HOUR,
@@ -175,6 +219,16 @@ SENSOR_TYPES = {
     TYPE_TEMP2C: ("Temperature 2", TEMP_CELSIUS,
                   TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
     TYPE_TEMP3C: ("Temperature 3", TEMP_CELSIUS,
+                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_TEMP4C: ("Temperature 4", TEMP_CELSIUS,
+                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_TEMP5C: ("Temperature 5", TEMP_CELSIUS,
+                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_TEMP6C: ("Temperature 6", TEMP_CELSIUS,
+                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_TEMP7C: ("Temperature 7", TEMP_CELSIUS,
+                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_TEMP8C: ("Temperature 8", TEMP_CELSIUS,
                   TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
     TYPE_TEMPINC: ("Indoor Temperature", TEMP_CELSIUS,
                    TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
@@ -214,12 +268,26 @@ SENSOR_TYPES = {
     TYPE_SOILMOISTURE8: ("Soil Moisture 8", UNIT_PERCENTAGE,
                          TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
                          "mdi:water-percent", 0),
-    TYPE_SOILMOISTURE9: ("Soil Moisture 9", UNIT_PERCENTAGE,
-                         TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
-                         "mdi:water-percent", 0),
-    TYPE_SOILMOISTURE10: ("Soil Moisture 10", UNIT_PERCENTAGE,
-                          TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
-                          "mdi:water-percent", 0),
+    TYPE_PM25_CH1: ("PM2.5 1", CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                    TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_PM25_CH2: ("PM2.5 2", CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                    TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_PM25_CH3: ("PM2.5 3", CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                    TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_PM25_CH4: ("PM2.5 4", CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                    TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_PM25_AVG_24H_CH1: ("PM2.5 24h average 1",
+                            CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                            TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_PM25_AVG_24H_CH2: ("PM2.5 24h average 2",
+                            CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                            TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_PM25_AVG_24H_CH3: ("PM2.5 24h average 3",
+                            CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                            TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_PM25_AVG_24H_CH4: ("PM2.5 24h average 4",
+                            CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                            TYPE_SENSOR, None, "mdi:eye", 0),
 }
 
 IGNORED_SENSORS = [
