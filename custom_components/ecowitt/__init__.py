@@ -70,12 +70,16 @@ TYPE_BAROMABSIN = "baromabsin"
 TYPE_BAROMRELIN = "baromrelin"
 TYPE_RAINRATEIN = "rainratein"
 TYPE_EVENTRAININ = "eventrainin"
+TYPE_HOURLYRAININ = "hourlyrainin"
+TYPE_TOTALRAININ = "totalrainin"
 TYPE_DAILYRAININ = "dailyrainin"
 TYPE_WEEKLYRAININ = "weeklyrainin"
 TYPE_MONTHLYRAININ = "monthlyrainin"
 TYPE_YEARLYRAININ = "yearlyrainin"
 TYPE_RAINRATEMM = "rainratemm"
 TYPE_EVENTRAINMM = "eventrainmm"
+TYPE_HOURLYRAINMM = "hourlyrainmm"
+TYPE_TOTALRAINMM = "totalrainmm"
 TYPE_DAILYRAINMM = "dailyrainmm"
 TYPE_WEEKLYRAINMM = "weeklyrainmm"
 TYPE_MONTHLYRAINMM = "monthlyrainmm"
@@ -95,6 +99,8 @@ TYPE_WINDSPEEDKMH = "windspeedkmh"
 TYPE_WINDGUSTKMH = "windgustkmh"
 TYPE_WINDSPEEDMPH = "windspeedmph"
 TYPE_WINDGUSTMPH = "windgustmph"
+TYPE_MAXDAILYGUST = "maxdailygust"
+TYPE_MAXDAILYGUSTKMH = "maxdailygustkmh"
 TYPE_TEMPC = "tempc"
 TYPE_TEMPINC = "tempinc"
 TYPE_TEMP1C = "temp1c"
@@ -152,6 +158,10 @@ SENSOR_TYPES = {
                       TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
     TYPE_EVENTRAININ: ("Event Rain Rate", f"{LENGTH_INCHES}/{TIME_HOURS}",
                        TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
+    TYPE_HOURLYRAININ: ("Hourly Rain Rate", f"{LENGTH_INCHES}/{TIME_HOURS}",
+                        TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
+    TYPE_TOTALRAININ: ("Total Rain Rate", f"{LENGTH_INCHES}/{TIME_HOURS}",
+                       TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
     TYPE_DAILYRAININ: ("Daily Rain Rate", f"{LENGTH_INCHES}/{TIME_DAYS}",
                        TYPE_SENSOR, None, "mdi:water", S_IMPERIAL),
     TYPE_WEEKLYRAININ: ("Weekly Rain Rate", f"{LENGTH_INCHES}/{TIME_WEEKS}",
@@ -163,6 +173,10 @@ SENSOR_TYPES = {
     TYPE_RAINRATEMM: ("Rain Rate", f"mm/{TIME_HOURS}",
                       TYPE_SENSOR, None, "mdi:water", S_METRIC),
     TYPE_EVENTRAINMM: ("Event Rain Rate", f"mm/{TIME_HOURS}",
+                       TYPE_SENSOR, None, "mdi:water", S_METRIC),
+    TYPE_HOURLYRAINMM: ("Hourly Rain Rate", f"mm/{TIME_HOURS}",
+                        TYPE_SENSOR, None, "mdi:water", S_METRIC),
+    TYPE_TOTALRAINMM: ("Total Rain Rate", f"mm/{TIME_HOURS}",
                        TYPE_SENSOR, None, "mdi:water", S_METRIC),
     TYPE_DAILYRAINMM: ("Daily Rain Rate", f"mm/{TIME_DAYS}",
                        TYPE_SENSOR, None, "mdi:water", S_METRIC),
@@ -212,6 +226,10 @@ SENSOR_TYPES = {
                         TYPE_SENSOR, None, "mdi:weather-windy", S_IMPERIAL),
     TYPE_WINDGUSTMPH: ("Wind Gust", SPEED_MILES_PER_HOUR,
                        TYPE_SENSOR, None, "mdi:weather-windy", S_IMPERIAL),
+    TYPE_MAXDAILYGUST: ("Max Daily Wind Gust", SPEED_MILES_PER_HOUR,
+                        TYPE_SENSOR, None, "mdi:weather-windy", S_IMPERIAL),
+    TYPE_MAXDAILYGUSTKMH: ("Max Daily Wind Gust", SPEED_MILES_PER_HOUR,
+                           TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC),
     TYPE_TEMPC: ("Outdoor Temperature", TEMP_CELSIUS,
                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
     TYPE_TEMP1C: ("Temperature 1", TEMP_CELSIUS,

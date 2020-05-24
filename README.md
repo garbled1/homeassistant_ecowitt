@@ -16,6 +16,14 @@ Windchill can be one of "hybrid", "old", or "new".  Defaults for units are
 as shown above.  The only mandatory "option" is "port".  Units can be one of
 "metric" or "imperial".
 
+## Warning
+
+This device expects to be fed data from an ecowitt during hass startup.
+Without this data, it doesn't know what devices to wire up.
+Hopefully I can fix this in the future, but for now, do the setup on the
+ecowitt device first, then add this to your configuration.yaml file.
+If you do not, hass may hang on startup.
+
 ## How to set up:
 
 Use the WS View app (on your phone) for your Ecowitt device, and connect to it.
