@@ -131,6 +131,18 @@ TYPE_PM25_AVG_24H_CH1 = "pm25_avg_24h_ch1"
 TYPE_PM25_AVG_24H_CH2 = "pm25_avg_24h_ch2"
 TYPE_PM25_AVG_24H_CH3 = "pm25_avg_24h_ch3"
 TYPE_PM25_AVG_24H_CH4 = "pm25_avg_24h_ch4"
+TYPE_WH68BATT = "wh68batt"
+TYPE_WH40BATT = "wh40batt"
+TYPE_WH26BATT = "wh26batt"
+TYPE_WH65BATT = "wh65batt"
+TYPE_SOILBATT1 = "soilbatt1"
+TYPE_SOILBATT2 = "soilbatt2"
+TYPE_SOILBATT3 = "soilbatt3"
+TYPE_SOILBATT4 = "soilbatt4"
+TYPE_SOILBATT5 = "soilbatt5"
+TYPE_SOILBATT6 = "soilbatt6"
+TYPE_SOILBATT7 = "soilbatt7"
+TYPE_SOILBATT8 = "soilbatt8"
 
 S_METRIC = 1
 S_IMPERIAL = 2
@@ -306,6 +318,30 @@ SENSOR_TYPES = {
     TYPE_PM25_AVG_24H_CH4: ("PM2.5 24h average 4",
                             CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
                             TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_WH68BATT: ("WH68 Battery", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_WH40BATT: ("WH40 Battery", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_WH26BATT: ("WH26 Battery", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_WH65BATT: ("WH65 Battery", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_SOILBATT1: ("Soil Moisture 1 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_SOILBATT2: ("Soil Moisture 2 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_SOILBATT3: ("Soil Moisture 3 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_SOILBATT4: ("Soil Moisture 4 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_SOILBATT5: ("Soil Moisture 5 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_SOILBATT6: ("Soil Moisture 6 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_SOILBATT7: ("Soil Moisture 7 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_SOILBATT8: ("Soil Moisture 8 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
 }
 
 IGNORED_SENSORS = [
