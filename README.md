@@ -31,7 +31,8 @@ Pick menu -> device list -> Pick your station.
 Hit next repeatedly to move to the last screen titled "Customized"
 
 Pick the protocol Ecowitt, and put in the ip/hostname of your hass server.
-Path doesn't matter, pick the default.
+Path doesn't matter as long as it ends in /, leave the default, or change it to
+just /.
 Pick a port that is not in use on the server (netstat -lt). 
 (4199 is probably a good default)
 Pick a reasonable value for updates, like 60 seconds.
