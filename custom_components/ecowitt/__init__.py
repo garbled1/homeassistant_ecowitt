@@ -353,6 +353,7 @@ IGNORED_SENSORS = [
     'dateutc',
     'windgustms',
     'windspeedms',
+    'maxdailygustms',
     'windchillf',
     'dewpointf',
     DATA_PASSKEY,
