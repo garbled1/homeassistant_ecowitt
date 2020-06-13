@@ -143,6 +143,14 @@ TYPE_SOILBATT5 = "soilbatt5"
 TYPE_SOILBATT6 = "soilbatt6"
 TYPE_SOILBATT7 = "soilbatt7"
 TYPE_SOILBATT8 = "soilbatt8"
+TYPE_BATTERY1 = "batt1"
+TYPE_BATTERY2 = "batt2"
+TYPE_BATTERY3 = "batt3"
+TYPE_BATTERY4 = "batt4"
+TYPE_BATTERY5 = "batt5"
+TYPE_BATTERY6 = "batt6"
+TYPE_BATTERY7 = "batt7"
+TYPE_BATTERY8 = "batt8"
 
 S_METRIC = 1
 S_IMPERIAL = 2
@@ -342,6 +350,22 @@ SENSOR_TYPES = {
                      None, "mdi:battery", 0),
     TYPE_SOILBATT8: ("Soil Moisture 8 Battery", "BATT", TYPE_SENSOR,
                      None, "mdi:battery", 0),
+    TYPE_BATTERY1: ("Battery 1", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_BATTERY2: ("Battery 2", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_BATTERY3: ("Battery 3", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_BATTERY4: ("Battery 4", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_BATTERY5: ("Battery 5", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_BATTERY6: ("Battery 6", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_BATTERY7: ("Battery 7", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_BATTERY8: ("Battery 8", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
 }
 
 IGNORED_SENSORS = [
@@ -350,6 +374,11 @@ IGNORED_SENSORS = [
     'temp1f',
     'temp2f',
     'temp3f',
+    'temp4f',
+    'temp5f',
+    'temp6f',
+    'temp7f',
+    'temp8f',
     'dateutc',
     'windgustms',
     'windspeedms',
