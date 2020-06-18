@@ -112,6 +112,15 @@ TYPE_TEMP6C = "temp6c"
 TYPE_TEMP7C = "temp7c"
 TYPE_TEMP8C = "temp8c"
 TYPE_DEWPOINTC = "dewpointc"
+TYPE_DEWPOINTINC = "dewpointinc"
+TYPE_DEWPOINT1C = "dewpoint1c"
+TYPE_DEWPOINT2C = "dewpoint2c"
+TYPE_DEWPOINT3C = "dewpoint3c"
+TYPE_DEWPOINT4C = "dewpoint4c"
+TYPE_DEWPOINT5C = "dewpoint5c"
+TYPE_DEWPOINT6C = "dewpoint6c"
+TYPE_DEWPOINT7C = "dewpoint7c"
+TYPE_DEWPOINT8C = "dewpoint8c"
 TYPE_WINDCHILLC = "windchillc"
 TYPE_SOLARRADIATION = "solarradiation"
 TYPE_UV = "uv"
@@ -274,6 +283,33 @@ SENSOR_TYPES = {
     TYPE_DEWPOINTC: ("Dewpoint", TEMP_CELSIUS,
                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
                      "mdi:thermometer", 0),
+    TYPE_DEWPOINTINC: ("Indoor Dewpoint", TEMP_CELSIUS,
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                     "mdi:thermometer", 0),
+    TYPE_DEWPOINT1C: ("Dewpoint 1", TEMP_CELSIUS,
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                     "mdi:thermometer", 0),
+    TYPE_DEWPOINT2C: ("Dewpoint 2", TEMP_CELSIUS,
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                     "mdi:thermometer", 0),
+    TYPE_DEWPOINT3C: ("Dewpoint 3", TEMP_CELSIUS,
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                     "mdi:thermometer", 0),
+    TYPE_DEWPOINT4C: ("Dewpoint 4", TEMP_CELSIUS,
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                     "mdi:thermometer", 0),
+    TYPE_DEWPOINT5C: ("Dewpoint 5", TEMP_CELSIUS,
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                     "mdi:thermometer", 0),
+    TYPE_DEWPOINT6C: ("Dewpoint 6", TEMP_CELSIUS,
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                     "mdi:thermometer", 0),
+    TYPE_DEWPOINT7C: ("Dewpoint 7", TEMP_CELSIUS,
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                     "mdi:thermometer", 0),
+    TYPE_DEWPOINT8C: ("Dewpoint 8", TEMP_CELSIUS,
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                     "mdi:thermometer", 0),
     TYPE_WINDCHILLC: ("Windchill", TEMP_CELSIUS,
                       TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
                       "mdi:thermometer", 0),
@@ -385,6 +421,15 @@ IGNORED_SENSORS = [
     'maxdailygustms',
     'windchillf',
     'dewpointf',
+    'dewpointinf',
+    'dewpoint1f',
+    'dewpoint2f',
+    'dewpoint3f',
+    'dewpoint4f',
+    'dewpoint5f',
+    'dewpoint6f',
+    'dewpoint7f',
+    'dewpoint8f',
     DATA_PASSKEY,
     DATA_STATIONTYPE,
     DATA_FREQ,
