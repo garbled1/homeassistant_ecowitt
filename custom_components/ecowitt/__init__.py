@@ -58,6 +58,7 @@ DATA_PASSKEY = "PASSKEY"
 DATA_STATIONTYPE = "stationtype"
 DATA_FREQ = "freq"
 DATA_MODEL = "model"
+DATA_READY = "ready"
 
 CONF_UNIT_BARO = "barounit"
 CONF_UNIT_WIND = "windunit"
@@ -422,6 +423,7 @@ async def async_setup(hass: HomeAssistant, config):
     # Store config
     hass.data[DOMAIN][DATA_CONFIG] = conf
     hass.data[DOMAIN][DATA_STATION] = {}
+    hass.data[DOMAIN][DATA_READY] = False
 
     # preload some model info
     stationinfo = hass.data[DOMAIN][DATA_STATION]
@@ -446,72 +448,79 @@ async def async_setup(hass: HomeAssistant, config):
         """ Close the ecowitt server."""
         await ws.stop()
 
-    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, close_server)
+    # hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, close_server)
 
-    # go to sleep until we get the first report
-    await ws.wait_for_valid_data()
+    # # go to sleep until we get the first report
+    # await ws.wait_for_valid_data()
 
-    # check if we have model info, etc.
-    if DATA_PASSKEY in ws.last_values:
-        stationinfo[DATA_PASSKEY] = ws.last_values[DATA_PASSKEY]
-        ws.last_values.pop(DATA_PASSKEY, None)
-    else:
-        _LOGGER.error("No passkey, cannot set unique id.")
-        return False
-    if DATA_STATIONTYPE in ws.last_values:
-        stationinfo[DATA_STATIONTYPE] = ws.last_values[DATA_STATIONTYPE]
-        ws.last_values.pop(DATA_STATIONTYPE, None)
-    if DATA_FREQ in ws.last_values:
-        stationinfo[DATA_FREQ] = ws.last_values[DATA_FREQ]
-        ws.last_values.pop(DATA_FREQ, None)
-    if DATA_MODEL in ws.last_values:
-        stationinfo[DATA_MODEL] = ws.last_values[DATA_MODEL]
-        ws.last_values.pop(DATA_MODEL, None)
+    async def _first_data_rec(weather_data):
+        _LOGGER.info("First ecowitt data recd, setting up sensors.")
+        # check if we have model info, etc.
+        if DATA_PASSKEY in ws.last_values:
+            stationinfo[DATA_PASSKEY] = ws.last_values[DATA_PASSKEY]
+            ws.last_values.pop(DATA_PASSKEY, None)
+        else:
+            _LOGGER.error("No passkey, cannot set unique id.")
+            return False
+        if DATA_STATIONTYPE in ws.last_values:
+            stationinfo[DATA_STATIONTYPE] = ws.last_values[DATA_STATIONTYPE]
+            ws.last_values.pop(DATA_STATIONTYPE, None)
+        if DATA_FREQ in ws.last_values:
+            stationinfo[DATA_FREQ] = ws.last_values[DATA_FREQ]
+            ws.last_values.pop(DATA_FREQ, None)
+        if DATA_MODEL in ws.last_values:
+            stationinfo[DATA_MODEL] = ws.last_values[DATA_MODEL]
+            ws.last_values.pop(DATA_MODEL, None)
 
-    # load the sensors we have
-    for sensor in ws.last_values.keys():
-        if sensor not in SENSOR_TYPES:
-            if sensor not in IGNORED_SENSORS:
-                _LOGGER.warning("Unhandled sensor type %s", sensor)
-            continue
-
-        # Is this a metric or imperial sensor, lookup and skip
-        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
-        if "baro" in sensor:
-            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL and
-                    metric == S_METRIC):
-                continue
-            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC and
-                    metric == S_IMPERIAL):
-                continue
-        if "rain" in sensor:
-            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL and
-                    metric == S_METRIC):
-                continue
-            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC and
-                    metric == S_IMPERIAL):
-                continue
-        if "wind" in sensor:
-            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL and
-                    metric == S_METRIC):
-                continue
-            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC and
-                    metric == S_IMPERIAL):
+        # load the sensors we have
+        for sensor in ws.last_values.keys():
+            if sensor not in SENSOR_TYPES:
+                if sensor not in IGNORED_SENSORS:
+                    _LOGGER.warning("Unhandled sensor type %s", sensor)
                 continue
 
-        all_sensors.append(sensor)
+            # Is this a metric or imperial sensor, lookup and skip
+            name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
+            if "baro" in sensor:
+                if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL and
+                        metric == S_METRIC):
+                    continue
+                if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC and
+                        metric == S_IMPERIAL):
+                    continue
+            if "rain" in sensor:
+                if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL and
+                        metric == S_METRIC):
+                    continue
+                if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC and
+                        metric == S_IMPERIAL):
+                    continue
+            if "wind" in sensor:
+                if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL and
+                        metric == S_METRIC):
+                    continue
+                if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC and
+                        metric == S_IMPERIAL):
+                    continue
 
-    if not all_sensors:
-        _LOGGER.error("No sensors found to monitor, check device config.")
-        return False
+            all_sensors.append(sensor)
 
-    hass.async_create_task(
-        async_load_platform(hass, "sensor", DOMAIN, all_sensors, config)
-    )
+        if not all_sensors:
+            _LOGGER.error("No sensors found to monitor, check device config.")
+            return False
+
+        hass.async_create_task(
+            async_load_platform(hass, "sensor", DOMAIN, all_sensors,
+                                config)
+        )
+        hass.data[DOMAIN][DATA_READY] = True
 
     async def _async_ecowitt_update_cb(weather_data):
         """Primary update callback called from pyecowitt."""
         _LOGGER.debug("Primary update callback triggered.")
+        if not hass.data[DOMAIN][DATA_READY]:
+            await _first_data_rec(weather_data)
+            return
         for sensor in weather_data.keys():
             if sensor not in SENSOR_TYPES:
                 if sensor not in IGNORED_SENSORS:
