@@ -96,6 +96,7 @@ TYPE_HUMIDITY7 = "humidity7"
 TYPE_HUMIDITY8 = "humidity8"
 TYPE_HUMIDITYIN = "humidityin"
 TYPE_WINDDIR = "winddir"
+TYPE_WINDDIR_A10 = "winddir_avg10m"
 TYPE_WINDSPEEDKMH = "windspeedkmh"
 TYPE_WINDSPEEDKMH_A10 = "windspdkmh_avg10m"
 TYPE_WINDGUSTKMH = "windgustkmh"
@@ -259,6 +260,8 @@ SENSOR_TYPES = {
                      "mdi:water-percent", 0),
     TYPE_WINDDIR: ("Wind Direction", DEGREE,
                    TYPE_SENSOR, None, "mdi:water-percent", 0),
+    TYPE_WINDDIR_A10: ("Wind Direction 10m Avg", DEGREE,
+                       TYPE_SENSOR, None, "mdi:water-percent", 0),
     TYPE_WINDSPEEDKMH: ("Wind Speed", SPEED_KILOMETERS_PER_HOUR,
                         TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC),
     TYPE_WINDSPEEDKMH_A10: ("Wind Speed 10m Avg", SPEED_KILOMETERS_PER_HOUR,
