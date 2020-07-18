@@ -4,7 +4,7 @@
   "config_flow": false,
   "documentation": "https://www.home-assistant.io/integrations/ecowitt",
   "requirements": [
-    "pyecowitt==0.8"
+    "pyecowitt==0.9"
   ],
   "ssdp": [],
   "zeroconf": [],

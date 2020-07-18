@@ -97,8 +97,10 @@ TYPE_HUMIDITY8 = "humidity8"
 TYPE_HUMIDITYIN = "humidityin"
 TYPE_WINDDIR = "winddir"
 TYPE_WINDSPEEDKMH = "windspeedkmh"
+TYPE_WINDSPEEDKMH_A10 = "windspdkmh_avg10m"
 TYPE_WINDGUSTKMH = "windgustkmh"
 TYPE_WINDSPEEDMPH = "windspeedmph"
+TYPE_WINDSPEEDMPH_A10 = "windspdmph_avg10m"
 TYPE_WINDGUSTMPH = "windgustmph"
 TYPE_MAXDAILYGUST = "maxdailygust"
 TYPE_MAXDAILYGUSTKMH = "maxdailygustkmh"
@@ -145,6 +147,7 @@ TYPE_WH68BATT = "wh68batt"
 TYPE_WH40BATT = "wh40batt"
 TYPE_WH26BATT = "wh26batt"
 TYPE_WH65BATT = "wh65batt"
+TYPE_WH57BATT = "wh57batt"
 TYPE_SOILBATT1 = "soilbatt1"
 TYPE_SOILBATT2 = "soilbatt2"
 TYPE_SOILBATT3 = "soilbatt3"
@@ -161,6 +164,14 @@ TYPE_BATTERY5 = "batt5"
 TYPE_BATTERY6 = "batt6"
 TYPE_BATTERY7 = "batt7"
 TYPE_BATTERY8 = "batt8"
+TYPE_PM25BATT1 = "pm25batt1"
+TYPE_PM25BATT2 = "pm25batt2"
+TYPE_PM25BATT3 = "pm25batt3"
+TYPE_PM25BATT4 = "pm25batt4"
+TYPE_PM25BATT5 = "pm25batt5"
+TYPE_PM25BATT6 = "pm25batt6"
+TYPE_PM25BATT7 = "pm25batt7"
+TYPE_PM25BATT8 = "pm25batt8"
 
 S_METRIC = 1
 S_IMPERIAL = 2
@@ -250,10 +261,15 @@ SENSOR_TYPES = {
                    TYPE_SENSOR, None, "mdi:water-percent", 0),
     TYPE_WINDSPEEDKMH: ("Wind Speed", SPEED_KILOMETERS_PER_HOUR,
                         TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC),
+    TYPE_WINDSPEEDKMH_A10: ("Wind Speed 10m Avg", SPEED_KILOMETERS_PER_HOUR,
+                            TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC),
     TYPE_WINDGUSTKMH: ("Wind Gust", SPEED_KILOMETERS_PER_HOUR,
                        TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC),
     TYPE_WINDSPEEDMPH: ("Wind Speed", SPEED_MILES_PER_HOUR,
                         TYPE_SENSOR, None, "mdi:weather-windy", S_IMPERIAL),
+    TYPE_WINDSPEEDMPH_A10: ("Wind Speed 10m Avg", SPEED_MILES_PER_HOUR,
+                            TYPE_SENSOR, None, "mdi:weather-windy",
+                            S_IMPERIAL),
     TYPE_WINDGUSTMPH: ("Wind Gust", SPEED_MILES_PER_HOUR,
                        TYPE_SENSOR, None, "mdi:weather-windy", S_IMPERIAL),
     TYPE_MAXDAILYGUST: ("Max Daily Wind Gust", SPEED_MILES_PER_HOUR,
@@ -285,32 +301,32 @@ SENSOR_TYPES = {
                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
                      "mdi:thermometer", 0),
     TYPE_DEWPOINTINC: ("Indoor Dewpoint", TEMP_CELSIUS,
-                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
-                     "mdi:thermometer", 0),
+                       TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                       "mdi:thermometer", 0),
     TYPE_DEWPOINT1C: ("Dewpoint 1", TEMP_CELSIUS,
-                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
-                     "mdi:thermometer", 0),
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                      "mdi:thermometer", 0),
     TYPE_DEWPOINT2C: ("Dewpoint 2", TEMP_CELSIUS,
-                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
-                     "mdi:thermometer", 0),
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                      "mdi:thermometer", 0),
     TYPE_DEWPOINT3C: ("Dewpoint 3", TEMP_CELSIUS,
-                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
-                     "mdi:thermometer", 0),
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                      "mdi:thermometer", 0),
     TYPE_DEWPOINT4C: ("Dewpoint 4", TEMP_CELSIUS,
-                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
-                     "mdi:thermometer", 0),
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                      "mdi:thermometer", 0),
     TYPE_DEWPOINT5C: ("Dewpoint 5", TEMP_CELSIUS,
-                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
-                     "mdi:thermometer", 0),
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                      "mdi:thermometer", 0),
     TYPE_DEWPOINT6C: ("Dewpoint 6", TEMP_CELSIUS,
-                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
-                     "mdi:thermometer", 0),
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                      "mdi:thermometer", 0),
     TYPE_DEWPOINT7C: ("Dewpoint 7", TEMP_CELSIUS,
-                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
-                     "mdi:thermometer", 0),
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                      "mdi:thermometer", 0),
     TYPE_DEWPOINT8C: ("Dewpoint 8", TEMP_CELSIUS,
-                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
-                     "mdi:thermometer", 0),
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
+                      "mdi:thermometer", 0),
     TYPE_WINDCHILLC: ("Windchill", TEMP_CELSIUS,
                       TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE,
                       "mdi:thermometer", 0),
@@ -371,6 +387,8 @@ SENSOR_TYPES = {
                     None, "mdi:battery", 0),
     TYPE_WH65BATT: ("WH65 Battery", "BATT", TYPE_SENSOR,
                     None, "mdi:battery", 0),
+    TYPE_WH57BATT: ("WH57 Battery", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
     TYPE_SOILBATT1: ("Soil Moisture 1 Battery", "BATT", TYPE_SENSOR,
                      None, "mdi:battery", 0),
     TYPE_SOILBATT2: ("Soil Moisture 2 Battery", "BATT", TYPE_SENSOR,
@@ -403,6 +421,22 @@ SENSOR_TYPES = {
                     None, "mdi:battery", 0),
     TYPE_BATTERY8: ("Battery 8", "BATT", TYPE_SENSOR,
                     None, "mdi:battery", 0),
+    TYPE_PM25BATT1: ("PM2.5 1 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_PM25BATT2: ("PM2.5 2 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_PM25BATT3: ("PM2.5 3 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_PM25BATT4: ("PM2.5 4 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_PM25BATT5: ("PM2.5 5 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_PM25BATT6: ("PM2.5 6 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_PM25BATT7: ("PM2.5 7 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_PM25BATT8: ("PM2.5 8 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
 }
 
 IGNORED_SENSORS = [
@@ -419,6 +453,7 @@ IGNORED_SENSORS = [
     'dateutc',
     'windgustms',
     'windspeedms',
+    'windspdms_avg10m'
     'maxdailygustms',
     'windchillf',
     'dewpointf',
