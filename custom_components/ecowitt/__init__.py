@@ -149,6 +149,8 @@ TYPE_WH40BATT = "wh40batt"
 TYPE_WH26BATT = "wh26batt"
 TYPE_WH65BATT = "wh65batt"
 TYPE_WH57BATT = "wh57batt"
+TYPE_WH25BATT = "wh25batt"
+TYPE_WH80BATT = "wh80batt"
 TYPE_SOILBATT1 = "soilbatt1"
 TYPE_SOILBATT2 = "soilbatt2"
 TYPE_SOILBATT3 = "soilbatt3"
@@ -392,6 +394,10 @@ SENSOR_TYPES = {
                     None, "mdi:battery", 0),
     TYPE_WH57BATT: ("WH57 Battery", "BATT", TYPE_SENSOR,
                     None, "mdi:battery", 0),
+    TYPE_WH25BATT: ("WH25 Battery", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_WH80BATT: ("WH80 Battery", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
     TYPE_SOILBATT1: ("Soil Moisture 1 Battery", "BATT", TYPE_SENSOR,
                      None, "mdi:battery", 0),
     TYPE_SOILBATT2: ("Soil Moisture 2 Battery", "BATT", TYPE_SENSOR,
@@ -456,7 +462,7 @@ IGNORED_SENSORS = [
     'dateutc',
     'windgustms',
     'windspeedms',
-    'windspdms_avg10m'
+    'windspdms_avg10m',
     'maxdailygustms',
     'windchillf',
     'dewpointf',
