@@ -1,15 +1,11 @@
 """Support for Ecowitt Weather Stations."""
 import logging
-import homeassistant.util.dt as dt_util
 
 from . import (
-    TYPE_SENSOR,
+    TYPE_BINARY_SENSOR,
     SENSOR_TYPES,
     EcowittEntity,
-    DEVICE_CLASS_TIMESTAMP
 )
-
-from homeassistant.const import STATE_UNKNOWN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,9 +20,9 @@ async def async_setup_platform(hass, config, async_add_entities,
     entities = []
     for sensor in discovery_info:
         name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
-        if kind == TYPE_SENSOR:
+        if kind == TYPE_BINARY_SENSOR:
             entities.append(
-                EcowittSensor(
+                EcowittBinarySensor(
                     hass,
                     sensor,
                     name,
@@ -38,7 +34,7 @@ async def async_setup_platform(hass, config, async_add_entities,
     async_add_entities(entities, True)
 
 
-class EcowittSensor(EcowittEntity):
+class EcowittBinarySensor(EcowittEntity):
 
     def __init__(self, hass, key, name, dc, uom, icon):
         """Initialize the sensor."""
@@ -48,23 +44,15 @@ class EcowittSensor(EcowittEntity):
         self._dc = dc
 
     @property
-    def state(self):
-        """Return the state of the sensor."""
-        if self._key in self._ws.last_values:
-            # Im concerned this is nonsense due to TZ...
-            if self._dc == DEVICE_CLASS_TIMESTAMP:
-                return dt_util.as_local(
-                    dt_util.utc_from_timestamp(self._ws.last_values[self._key])
-                ).isoformat()
-            return self._ws.last_values[self._key]
-        _LOGGER.warning("Sensor %s not in last update, check range or battery",
-                        self._key)
-        return STATE_UNKNOWN
-
-    @property
-    def unit_of_measurement(self):
-        """Return the unit of measurement."""
-        return self._uom
+    def is_on(self):
+        """Return true if the binary sensor is on."""
+        if self._key in self._ws_last_values:
+            if self._ws.last_values[self._key] > 0:
+                return True
+        else:
+            _LOGGER.warning("Sensor %s not in last update, check range or battery",
+                            self._key)
+        return False
 
     @property
     def icon(self):
@@ -72,6 +60,6 @@ class EcowittSensor(EcowittEntity):
         return self._icon
 
     @property
-    def device_info(self):
+    def device_class(self):
         """Return the device class."""
         return self._dc

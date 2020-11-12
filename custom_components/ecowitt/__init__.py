@@ -22,7 +22,6 @@ from homeassistant.helpers.entity import Entity
 
 from homeassistant.const import (
     DEGREE,
-    EVENT_HOMEASSISTANT_STOP,
     CONF_PORT,
     CONF_UNIT_SYSTEM_METRIC,
     CONF_UNIT_SYSTEM_IMPERIAL,
@@ -48,11 +47,13 @@ from homeassistant.const import (
     DEVICE_CLASS_TEMPERATURE,
     DEVICE_CLASS_PRESSURE,
     DEVICE_CLASS_TIMESTAMP,
+    DEVICE_CLASS_MOISTURE,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 TYPE_SENSOR = "sensor"
+TYPE_BINARY_SENSOR = "binary_sensor"
 DOMAIN = "ecowitt"
 DATA_CONFIG = "config"
 DATA_ECOWITT = "ecowitt_listener"
@@ -151,12 +152,16 @@ TYPE_LIGHTNING_TIME = "lightning_time"
 TYPE_LIGHTNING_NUM = "lightning_num"
 TYPE_LIGHTNING_KM = "lightning"
 TYPE_LIGHTNING_MI = "lightning_mi"
-TYPE_WH68BATT = "wh68batt"
-TYPE_WH40BATT = "wh40batt"
-TYPE_WH26BATT = "wh26batt"
-TYPE_WH65BATT = "wh65batt"
-TYPE_WH57BATT = "wh57batt"
+TYPE_LEAK_CH1 = "leak_ch1"
+TYPE_LEAK_CH2 = "leak_ch2"
+TYPE_LEAK_CH3 = "leak_ch3"
+TYPE_LEAK_CH4 = "leak_ch4"
 TYPE_WH25BATT = "wh25batt"
+TYPE_WH26BATT = "wh26batt"
+TYPE_WH40BATT = "wh40batt"
+TYPE_WH57BATT = "wh57batt"
+TYPE_WH68BATT = "wh68batt"
+TYPE_WH65BATT = "wh65batt"
 TYPE_WH80BATT = "wh80batt"
 TYPE_SOILBATT1 = "soilbatt1"
 TYPE_SOILBATT2 = "soilbatt2"
@@ -182,6 +187,14 @@ TYPE_PM25BATT5 = "pm25batt5"
 TYPE_PM25BATT6 = "pm25batt6"
 TYPE_PM25BATT7 = "pm25batt7"
 TYPE_PM25BATT8 = "pm25batt8"
+TYPE_LEAKBATT1 = "leakbatt1"
+TYPE_LEAKBATT2 = "leakbatt2"
+TYPE_LEAKBATT3 = "leakbatt3"
+TYPE_LEAKBATT4 = "leakbatt4"
+TYPE_LEAKBATT5 = "leakbatt5"
+TYPE_LEAKBATT6 = "leakbatt6"
+TYPE_LEAKBATT7 = "leakbatt7"
+TYPE_LEAKBATT8 = "leakbatt8"
 
 S_METRIC = 1
 S_IMPERIAL = 2
@@ -189,6 +202,8 @@ S_IMPERIAL = 2
 W_TYPE_NEW = "new"
 W_TYPE_OLD = "old"
 W_TYPE_HYBRID = "hybrid"
+
+LEAK_DETECTED = "Leak Detected"
 
 # Name, unit_of_measure, type, device_class, icon, metric=1
 # name, uom, kind, device_class, icon, metric = SENSOR_TYPES[x]
@@ -399,17 +414,25 @@ SENSOR_TYPES = {
                         TYPE_SENSOR, None, "mdi:ruler", S_METRIC),
     TYPE_LIGHTNING_MI: ("Lightning strike distance", LENGTH_MILES,
                         TYPE_SENSOR, None, "mdi:ruler", S_IMPERIAL),
-    TYPE_WH68BATT: ("WH68 Battery", "BATT", TYPE_SENSOR,
-                    None, "mdi:battery", 0),
-    TYPE_WH40BATT: ("WH40 Battery", "BATT", TYPE_SENSOR,
+    TYPE_LEAK_CH1: ("Leak Detection 1", LEAK_DETECTED, TYPE_BINARY_SENSOR,
+                    DEVICE_CLASS_MOISTURE, "mdi:leak", 0),
+    TYPE_LEAK_CH2: ("Leak Detection 2", LEAK_DETECTED, TYPE_BINARY_SENSOR,
+                    DEVICE_CLASS_MOISTURE, "mdi:leak", 0),
+    TYPE_LEAK_CH3: ("Leak Detection 3", LEAK_DETECTED, TYPE_BINARY_SENSOR,
+                    DEVICE_CLASS_MOISTURE, "mdi:leak", 0),
+    TYPE_LEAK_CH4: ("Leak Detection 4", LEAK_DETECTED, TYPE_BINARY_SENSOR,
+                    DEVICE_CLASS_MOISTURE, "mdi:leak", 0),
+    TYPE_WH25BATT: ("WH25 Battery", "BATT", TYPE_SENSOR,
                     None, "mdi:battery", 0),
     TYPE_WH26BATT: ("WH26 Battery", "BATT", TYPE_SENSOR,
                     None, "mdi:battery", 0),
-    TYPE_WH65BATT: ("WH65 Battery", "BATT", TYPE_SENSOR,
+    TYPE_WH40BATT: ("WH40 Battery", "BATT", TYPE_SENSOR,
                     None, "mdi:battery", 0),
     TYPE_WH57BATT: ("WH57 Battery", "BATT", TYPE_SENSOR,
                     None, "mdi:battery", 0),
-    TYPE_WH25BATT: ("WH25 Battery", "BATT", TYPE_SENSOR,
+    TYPE_WH65BATT: ("WH65 Battery", "BATT", TYPE_SENSOR,
+                    None, "mdi:battery", 0),
+    TYPE_WH68BATT: ("WH68 Battery", "BATT", TYPE_SENSOR,
                     None, "mdi:battery", 0),
     TYPE_WH80BATT: ("WH80 Battery", "BATT", TYPE_SENSOR,
                     None, "mdi:battery", 0),
@@ -460,6 +483,22 @@ SENSOR_TYPES = {
     TYPE_PM25BATT7: ("PM2.5 7 Battery", "BATT", TYPE_SENSOR,
                      None, "mdi:battery", 0),
     TYPE_PM25BATT8: ("PM2.5 8 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_LEAKBATT1: ("Leak 1 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_LEAKBATT2: ("Leak 2 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_LEAKBATT3: ("Leak 3 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_LEAKBATT4: ("Leak 4 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_LEAKBATT5: ("Leak 5 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_LEAKBATT6: ("Leak 6 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_LEAKBATT7: ("Leak 7 Battery", "BATT", TYPE_SENSOR,
+                     None, "mdi:battery", 0),
+    TYPE_LEAKBATT8: ("Leak 8 Battery", "BATT", TYPE_SENSOR,
                      None, "mdi:battery", 0),
 }
 
@@ -517,7 +556,8 @@ async def async_setup(hass: HomeAssistant, config):
     """Set up the Ecowitt component."""
 
     hass.data[DOMAIN] = {}
-    all_sensors = []
+    sensor_sensors = []
+    binary_sensors = []
 
     if DOMAIN not in config:
         return True
@@ -557,6 +597,42 @@ async def async_setup(hass: HomeAssistant, config):
     # # go to sleep until we get the first report
     # await ws.wait_for_valid_data()
 
+    def check_and_append_sensor(sensor):
+        """Check the sensor for validity, and append to appropriate list."""
+        if sensor not in SENSOR_TYPES:
+            if sensor not in IGNORED_SENSORS:
+                _LOGGER.warning("Unhandled sensor type %s", sensor)
+            return
+
+        # Is this a metric or imperial sensor, lookup and skip
+        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
+        if "baro" in sensor:
+            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL
+                    and metric == S_METRIC):
+                return
+            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC
+                    and metric == S_IMPERIAL):
+                return
+        if "rain" in sensor:
+            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL
+                    and metric == S_METRIC):
+                return
+            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC
+                    and metric == S_IMPERIAL):
+                return
+        if "wind" in sensor:
+            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL
+                    and metric == S_METRIC):
+                return
+            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC
+                    and metric == S_IMPERIAL):
+                return
+
+        if kind == TYPE_SENSOR:
+            sensor_sensors.append(sensor)
+        if kind == TYPE_BINARY_SENSOR:
+            binary_sensors.append(sensor)
+
     async def _first_data_rec(weather_data):
         _LOGGER.info("First ecowitt data recd, setting up sensors.")
         # check if we have model info, etc.
@@ -578,45 +654,22 @@ async def async_setup(hass: HomeAssistant, config):
 
         # load the sensors we have
         for sensor in ws.last_values.keys():
-            if sensor not in SENSOR_TYPES:
-                if sensor not in IGNORED_SENSORS:
-                    _LOGGER.warning("Unhandled sensor type %s", sensor)
-                continue
+            check_and_append_sensor(sensor)
 
-            # Is this a metric or imperial sensor, lookup and skip
-            name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
-            if "baro" in sensor:
-                if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL and
-                        metric == S_METRIC):
-                    continue
-                if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC and
-                        metric == S_IMPERIAL):
-                    continue
-            if "rain" in sensor:
-                if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL and
-                        metric == S_METRIC):
-                    continue
-                if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC and
-                        metric == S_IMPERIAL):
-                    continue
-            if "wind" in sensor:
-                if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL and
-                        metric == S_METRIC):
-                    continue
-                if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC and
-                        metric == S_IMPERIAL):
-                    continue
-
-            all_sensors.append(sensor)
-
-        if not all_sensors:
+        if not sensor_sensors and not binary_sensors:
             _LOGGER.error("No sensors found to monitor, check device config.")
             return False
 
-        hass.async_create_task(
-            async_load_platform(hass, "sensor", DOMAIN, all_sensors,
-                                config)
-        )
+        if sensor_sensors:
+            hass.async_create_task(
+                async_load_platform(hass, "sensor", DOMAIN, sensor_sensors,
+                                    config)
+            )
+        if binary_sensors:
+            hass.async_create_task(
+                async_load_platform(hass, "binary_sensor", DOMAIN, binary_sensors,
+                                    config)
+            )
         hass.data[DOMAIN][DATA_READY] = True
 
     async def _async_ecowitt_update_cb(weather_data):
@@ -628,8 +681,11 @@ async def async_setup(hass: HomeAssistant, config):
         for sensor in weather_data.keys():
             if sensor not in SENSOR_TYPES:
                 if sensor not in IGNORED_SENSORS:
-                    _LOGGER.warning("Unhandled sensor type %s value %s, " +
-                                    "file a PR.", sensor, weather_data[sensor])
+                    _LOGGER.warning("Unhandled sensor type %s value %s, "
+                                    + "file a PR.", sensor, weather_data[sensor])
+            if sensor not in sensor_sensors and sensor not in binary_sensors:
+                _LOGGER.warning("Unregistered sensor type %s value %s received.",
+                                sensor, weather_data[sensor])
         async_dispatcher_send(hass, DOMAIN)
 
     ws.register_listener(_async_ecowitt_update_cb)
