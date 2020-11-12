@@ -47,6 +47,9 @@ from homeassistant.const import (
     DEVICE_CLASS_TEMPERATURE,
     DEVICE_CLASS_PRESSURE,
     DEVICE_CLASS_TIMESTAMP,
+)
+
+from homeassistant.components.binary_sensor import (
     DEVICE_CLASS_MOISTURE,
 )
 
@@ -597,6 +600,33 @@ async def async_setup(hass: HomeAssistant, config):
     # # go to sleep until we get the first report
     # await ws.wait_for_valid_data()
 
+    def check_imp_metric_sensor(sensor):
+        """Check if this is the wrong sensor for our config (imp/metric)."""
+        # Is this a metric or imperial sensor, lookup and skip
+        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
+        if "baro" in sensor:
+            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL
+                    and metric == S_METRIC):
+                return False
+            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC
+                    and metric == S_IMPERIAL):
+                return False
+        if "rain" in sensor:
+            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL
+                    and metric == S_METRIC):
+                return False
+            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC
+                    and metric == S_IMPERIAL):
+                return False
+        if "wind" in sensor:
+            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL
+                    and metric == S_METRIC):
+                return False
+            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC
+                    and metric == S_IMPERIAL):
+                return False
+        return True
+
     def check_and_append_sensor(sensor):
         """Check the sensor for validity, and append to appropriate list."""
         if sensor not in SENSOR_TYPES:
@@ -605,29 +635,10 @@ async def async_setup(hass: HomeAssistant, config):
             return
 
         # Is this a metric or imperial sensor, lookup and skip
-        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
-        if "baro" in sensor:
-            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL
-                    and metric == S_METRIC):
-                return
-            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC
-                    and metric == S_IMPERIAL):
-                return
-        if "rain" in sensor:
-            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL
-                    and metric == S_METRIC):
-                return
-            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC
-                    and metric == S_IMPERIAL):
-                return
-        if "wind" in sensor:
-            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL
-                    and metric == S_METRIC):
-                return
-            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC
-                    and metric == S_IMPERIAL):
-                return
+        if not check_imp_metric_sensor(sensor):
+            return
 
+        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
         if kind == TYPE_SENSOR:
             sensor_sensors.append(sensor)
         if kind == TYPE_BINARY_SENSOR:
@@ -683,7 +694,10 @@ async def async_setup(hass: HomeAssistant, config):
                 if sensor not in IGNORED_SENSORS:
                     _LOGGER.warning("Unhandled sensor type %s value %s, "
                                     + "file a PR.", sensor, weather_data[sensor])
-            if sensor not in sensor_sensors and sensor not in binary_sensors:
+            elif (sensor not in sensor_sensors
+                  and sensor not in binary_sensors
+                  and sensor not in IGNORED_SENSORS
+                  and check_imp_metric_sensor(sensor)):
                 _LOGGER.warning("Unregistered sensor type %s value %s received.",
                                 sensor, weather_data[sensor])
         async_dispatcher_send(hass, DOMAIN)
