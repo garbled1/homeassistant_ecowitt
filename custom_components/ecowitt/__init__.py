@@ -33,6 +33,8 @@ from homeassistant.const import (
     PRESSURE_HPA,
     PRESSURE_INHG,
     LENGTH_INCHES,
+    LENGTH_KILOMETERS,
+    LENGTH_MILES,
     SPEED_KILOMETERS_PER_HOUR,
     SPEED_MILES_PER_HOUR,
     TIME_HOURS,
@@ -45,6 +47,7 @@ from homeassistant.const import (
     DEVICE_CLASS_ILLUMINANCE,
     DEVICE_CLASS_TEMPERATURE,
     DEVICE_CLASS_PRESSURE,
+    DEVICE_CLASS_TIMESTAMP,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -144,6 +147,10 @@ TYPE_PM25_AVG_24H_CH1 = "pm25_avg_24h_ch1"
 TYPE_PM25_AVG_24H_CH2 = "pm25_avg_24h_ch2"
 TYPE_PM25_AVG_24H_CH3 = "pm25_avg_24h_ch3"
 TYPE_PM25_AVG_24H_CH4 = "pm25_avg_24h_ch4"
+TYPE_LIGHTNING_TIME = "lightning_time"
+TYPE_LIGHTNING_NUM = "lightning_num"
+TYPE_LIGHTNING_KM = "lightning"
+TYPE_LIGHTNING_MI = "lightning_mi"
 TYPE_WH68BATT = "wh68batt"
 TYPE_WH40BATT = "wh40batt"
 TYPE_WH26BATT = "wh26batt"
@@ -384,6 +391,14 @@ SENSOR_TYPES = {
     TYPE_PM25_AVG_24H_CH4: ("PM2.5 24h average 4",
                             CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
                             TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_LIGHTNING_TIME: ("Last Lightning strike", "",
+                          TYPE_SENSOR, DEVICE_CLASS_TIMESTAMP, "mdi:clock", 0),
+    TYPE_LIGHTNING_NUM: ("Lightning strikes", f"strikes/{TIME_DAYS}",
+                         TYPE_SENSOR, None, "mdi:weather-lightning", 0),
+    TYPE_LIGHTNING_KM: ("Lightning strike distance", LENGTH_KILOMETERS,
+                        TYPE_SENSOR, None, "mdi:ruler", S_METRIC),
+    TYPE_LIGHTNING_MI: ("Lightning strike distance", LENGTH_MILES,
+                        TYPE_SENSOR, None, "mdi:ruler", S_IMPERIAL),
     TYPE_WH68BATT: ("WH68 Battery", "BATT", TYPE_SENSOR,
                     None, "mdi:battery", 0),
     TYPE_WH40BATT: ("WH40 Battery", "BATT", TYPE_SENSOR,

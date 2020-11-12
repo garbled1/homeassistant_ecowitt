@@ -1,5 +1,6 @@
 """Support for Ecowitt Weather Stations."""
 import logging
+import homeassistant.util.dt as dt_util
 
 from . import (
     TYPE_SENSOR,
@@ -7,6 +8,7 @@ from . import (
     DATA_STATION,
     SENSOR_TYPES,
     EcowittEntity,
+    DEVICE_CLASS_TIMESTAMP
 )
 
 from homeassistant.const import STATE_UNKNOWN
@@ -51,6 +53,11 @@ class EcowittSensor(EcowittEntity):
     def state(self):
         """Return the state of the sensor."""
         if self._key in self._ws.last_values:
+            # Im concerned this is nonsense due to TZ...
+            if self._dc == DEVICE_CLASS_TIMESTAMP:
+                return dt_util.as_local(
+                    dt_util.utc_from_timestamp(self._ws.last_values[self._key])
+                ).isoformat()
             return self._ws.last_values[self._key]
         _LOGGER.warning("Sensor %s not in last update, check range or battery",
                         self._key)
