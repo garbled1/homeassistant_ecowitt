@@ -19,7 +19,7 @@
 		    "wind_unit": "Wind Unit",
 		    "rain_unit": "Rainfall Unit",
 		    "lightning_unit": "Lightning distance unit",
-		    "windchill_unit": "Windchill calculation",
+		    "windchill_unit": "Windchill calculation"
 		}
 	    }
 	}
