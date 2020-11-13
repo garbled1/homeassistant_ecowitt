@@ -79,13 +79,8 @@ class EcowittConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_import(self, device_config):
         """Import a configuration.yaml config, if any."""
-
-        _LOGGER.error(device_config)
-        port = device_config[CONF_PORT]
-        return self.async_create_entry(
-            title=f"Ecowitt on port {port}",
-            data=device_config
-        )
+        # this is broken as hell.  It calls it once with each line of the conf.
+        pass
 
     async def async_step_user(self, user_input=None):
         """Give initial instructions for setup."""
