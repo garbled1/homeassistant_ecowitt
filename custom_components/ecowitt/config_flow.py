@@ -80,8 +80,8 @@ class EcowittConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_import(self, device_config):
         """Import a configuration.yaml config, if any."""
 
-        port = device_config[CONF_PORT]
         _LOGGER.error(device_config)
+        port = device_config[CONF_PORT]
         return self.async_create_entry(
             title=f"Ecowitt on port {port}",
             data=device_config
