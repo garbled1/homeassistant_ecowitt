@@ -1,6 +1,6 @@
 {
     "config": {
-	"title": "Ecowitt Weather Station.",
+	"title": "Ecowitt Weather Station",
 	"abort": {
 	    "already_configured": "Device is already configured.",
 	    "unknown": "Unknown error."
