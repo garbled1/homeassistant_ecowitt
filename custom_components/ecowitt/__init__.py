@@ -95,6 +95,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     binary_sensors = []
 
     # Store config
+    _LOGGER.error(entry.entry_id)
+    hass.data[DOMAIN][entry.entry_id] = {}
     hass.data[DOMAIN][entry.entry_id][DATA_STATION] = {}
     hass.data[DOMAIN][entry.entry_id][DATA_READY] = False
 
