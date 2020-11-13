@@ -71,6 +71,7 @@ CONF_UNIT_BARO = "barounit"
 CONF_UNIT_WIND = "windunit"
 CONF_UNIT_RAIN = "rainunit"
 CONF_UNIT_WINDCHILL = "windchillunit"
+CONF_UNIT_LIGHTNING = "lightningunit"
 
 TYPE_BAROMABSHPA = "baromabshpa"
 TYPE_BAROMRELHPA = "baromrelhpa"
@@ -547,6 +548,8 @@ COMPONENT_SCHEMA = vol.Schema(
                      default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
         vol.Optional(CONF_UNIT_RAIN,
                      default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
+        vol.Optional(CONF_UNIT_LIGHTNING,
+                     default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
         vol.Optional(CONF_UNIT_WINDCHILL,
                      default=W_TYPE_HYBRID): cv.string,
     }
@@ -625,6 +628,12 @@ async def async_setup(hass: HomeAssistant, config):
             if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC
                     and metric == S_IMPERIAL):
                 return False
+        if (sensor == 'lightning'
+                and conf[CONF_UNIT_LIGHTNING] == CONF_UNIT_SYSTEM_IMPERIAL):
+            return False
+        if (sensor == 'lightning_mi'
+                and conf[CONF_UNIT_LIGHTNING] == CONF_UNIT_SYSTEM_METRIC):
+            return False
         return True
 
     def check_and_append_sensor(sensor):
@@ -632,17 +641,18 @@ async def async_setup(hass: HomeAssistant, config):
         if sensor not in SENSOR_TYPES:
             if sensor not in IGNORED_SENSORS:
                 _LOGGER.warning("Unhandled sensor type %s", sensor)
-            return
+            return None
 
         # Is this a metric or imperial sensor, lookup and skip
         if not check_imp_metric_sensor(sensor):
-            return
+            return None
 
         name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
         if kind == TYPE_SENSOR:
             sensor_sensors.append(sensor)
         if kind == TYPE_BINARY_SENSOR:
             binary_sensors.append(sensor)
+        return(kind)
 
     async def _first_data_rec(weather_data):
         _LOGGER.info("First ecowitt data recd, setting up sensors.")
@@ -700,6 +710,21 @@ async def async_setup(hass: HomeAssistant, config):
                   and check_imp_metric_sensor(sensor)):
                 _LOGGER.warning("Unregistered sensor type %s value %s received.",
                                 sensor, weather_data[sensor])
+                # try to register the sensor
+                new_sensor = []
+                new_sensor.append(sensor)
+                kind = check_and_append_sensor(sensor)
+                if kind == TYPE_SENSOR:
+                    hass.async_create_task(
+                        async_load_platform(hass, "sensor", DOMAIN,
+                                            new_sensor, config)
+                    )
+                if kind == TYPE_BINARY_SENSOR:
+                    hass.async_create_task(
+                        async_load_platform(hass, "binary_sensor", DOMAIN,
+                                            new_sensor, config)
+                    )
+
         async_dispatcher_send(hass, DOMAIN)
 
     ws.register_listener(_async_ecowitt_update_cb)

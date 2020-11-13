@@ -51,7 +51,7 @@ class EcowittSensor(EcowittEntity):
     def state(self):
         """Return the state of the sensor."""
         if self._key in self._ws.last_values:
-            # Im concerned this is nonsense due to TZ...
+            # The lightning time is reported in UTC, hooray.
             if self._dc == DEVICE_CLASS_TIMESTAMP:
                 return dt_util.as_local(
                     dt_util.utc_from_timestamp(self._ws.last_values[self._key])
