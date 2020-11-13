@@ -77,6 +77,14 @@ class EcowittConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_UNKNOWN
 
+    async def async_step_import(self, device_config):
+        """Import a configuration.yaml config, if any."""
+
+        return self.async_create_entry(
+            title=f"Ecowitt on port {device_config[CONF_PORT]}",
+            data=device_config
+        )
+
     async def async_step_user(self, user_input=None):
         """Give initial instructions for setup."""
         if user_input is not None:
