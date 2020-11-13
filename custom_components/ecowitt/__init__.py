@@ -11,6 +11,7 @@ from pyecowitt import (
 )
 import voluptuous as vol
 
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.core import HomeAssistant, callback
@@ -41,6 +42,7 @@ from .const import (
     DATA_FREQ,
     DATA_MODEL,
     DATA_READY,
+    ECOWITT_PLATFORMS,
     IGNORED_SENSORS,
     S_IMPERIAL,
     S_METRIC,
@@ -73,38 +75,45 @@ COMPONENT_SCHEMA = vol.Schema(
 CONFIG_SCHEMA = vol.Schema({DOMAIN: COMPONENT_SCHEMA}, extra=vol.ALLOW_EXTRA)
 
 
-async def async_setup(hass: HomeAssistant, config):
-    """Set up the Ecowitt component."""
-
+async def async_setup(hass: HomeAssistant, config: dict):
+    """Configure the Ecowitt component using flow only."""
     hass.data[DOMAIN] = {}
+
+    if DOMAIN in config:
+        for entry in config[DOMAIN]:
+            hass.async_create_task(
+                hass.config_entries.flow.async_init(
+                    DOMAIN, context={"source": SOURCE_IMPORT}, data=entry
+                )
+            )
+    return True
+
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Set up the Ecowitt component from a config entry."""
+
     sensor_sensors = []
     binary_sensors = []
 
-    if DOMAIN not in config:
-        return True
-
-    conf = config[DOMAIN]
-
     # Store config
-    hass.data[DOMAIN][DATA_CONFIG] = conf
-    hass.data[DOMAIN][DATA_STATION] = {}
-    hass.data[DOMAIN][DATA_READY] = False
+    hass.data[DOMAIN][entry.entry_id][DATA_STATION] = {}
+    hass.data[DOMAIN][entry.entry_id][DATA_READY] = False
 
     # preload some model info
-    stationinfo = hass.data[DOMAIN][DATA_STATION]
+    stationinfo = hass.data[DOMAIN][entry.entry_id][DATA_STATION]
     stationinfo[DATA_STATIONTYPE] = "Unknown"
     stationinfo[DATA_FREQ] = "Unknown"
     stationinfo[DATA_MODEL] = "Unknown"
 
     # setup the base connection
-    ws = EcoWittListener(port=conf[CONF_PORT])
-    hass.data[DOMAIN][DATA_ECOWITT] = ws
+    ws = EcoWittListener(port=entry.data[CONF_PORT])
+    hass.data[DOMAIN][entry.entry_id][DATA_ECOWITT] = ws
 
-    if conf[CONF_UNIT_WINDCHILL] == W_TYPE_OLD:
+    if entry.data[CONF_UNIT_WINDCHILL] == W_TYPE_OLD:
         ws.set_windchill(WINDCHILL_OLD)
-    if conf[CONF_UNIT_WINDCHILL] == W_TYPE_NEW:
+    if entry.data[CONF_UNIT_WINDCHILL] == W_TYPE_NEW:
         ws.set_windchill(WINDCHILL_NEW)
-    if conf[CONF_UNIT_WINDCHILL] == W_TYPE_HYBRID:
+    if entry.data[CONF_UNIT_WINDCHILL] == W_TYPE_HYBRID:
         ws.set_windchill(WINDCHILL_HYBRID)
 
     hass.loop.create_task(ws.listen())
@@ -123,31 +132,31 @@ async def async_setup(hass: HomeAssistant, config):
         # Is this a metric or imperial sensor, lookup and skip
         name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
         if "baro" in sensor:
-            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL
+            if (entry.data[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL
                     and metric == S_METRIC):
                 return False
-            if (conf[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC
+            if (entry.data[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC
                     and metric == S_IMPERIAL):
                 return False
         if "rain" in sensor:
-            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL
+            if (entry.data[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL
                     and metric == S_METRIC):
                 return False
-            if (conf[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC
+            if (entry.data[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC
                     and metric == S_IMPERIAL):
                 return False
         if "wind" in sensor:
-            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL
+            if (entry.data[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL
                     and metric == S_METRIC):
                 return False
-            if (conf[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC
+            if (entry.data[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC
                     and metric == S_IMPERIAL):
                 return False
         if (sensor == 'lightning'
-                and conf[CONF_UNIT_LIGHTNING] == CONF_UNIT_SYSTEM_IMPERIAL):
+                and entry.data[CONF_UNIT_LIGHTNING] == CONF_UNIT_SYSTEM_IMPERIAL):
             return False
         if (sensor == 'lightning_mi'
-                and conf[CONF_UNIT_LIGHTNING] == CONF_UNIT_SYSTEM_METRIC):
+                and entry.data[CONF_UNIT_LIGHTNING] == CONF_UNIT_SYSTEM_METRIC):
             return False
         return True
 
@@ -199,19 +208,19 @@ async def async_setup(hass: HomeAssistant, config):
         if sensor_sensors:
             hass.async_create_task(
                 async_load_platform(hass, "sensor", DOMAIN, sensor_sensors,
-                                    config)
+                                    entry.data)
             )
         if binary_sensors:
             hass.async_create_task(
                 async_load_platform(hass, "binary_sensor", DOMAIN, binary_sensors,
-                                    config)
+                                    entry.data)
             )
-        hass.data[DOMAIN][DATA_READY] = True
+        hass.data[DOMAIN][entry.entry_id][DATA_READY] = True
 
     async def _async_ecowitt_update_cb(weather_data):
         """Primary update callback called from pyecowitt."""
         _LOGGER.debug("Primary update callback triggered.")
-        if not hass.data[DOMAIN][DATA_READY]:
+        if not hass.data[DOMAIN][entry.entry_id][DATA_READY]:
             await _first_data_rec(weather_data)
             return
         for sensor in weather_data.keys():
@@ -232,12 +241,12 @@ async def async_setup(hass: HomeAssistant, config):
                 if kind == TYPE_SENSOR:
                     hass.async_create_task(
                         async_load_platform(hass, "sensor", DOMAIN,
-                                            new_sensor, config)
+                                            new_sensor, entry.data)
                     )
                 if kind == TYPE_BINARY_SENSOR:
                     hass.async_create_task(
                         async_load_platform(hass, "binary_sensor", DOMAIN,
-                                            new_sensor, config)
+                                            new_sensor, entry.data)
                     )
 
         async_dispatcher_send(hass, DOMAIN)

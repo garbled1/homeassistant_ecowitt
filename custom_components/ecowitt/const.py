@@ -30,6 +30,8 @@ from homeassistant.components.binary_sensor import (
     DEVICE_CLASS_MOISTURE,
 )
 
+ECOWITT_PLATFORMS = ["sensor", "binary_sensor"]
+
 TYPE_SENSOR = "sensor"
 TYPE_BINARY_SENSOR = "binary_sensor"
 DOMAIN = "ecowitt"
@@ -42,6 +44,9 @@ DATA_FREQ = "freq"
 DATA_MODEL = "model"
 DATA_READY = "ready"
 
+DEFAULT_PORT = 4199
+
+CONF_NAME = "component_name"
 CONF_UNIT_BARO = "barounit"
 CONF_UNIT_WIND = "windunit"
 CONF_UNIT_RAIN = "rainunit"
