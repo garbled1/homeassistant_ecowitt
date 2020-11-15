@@ -1,5 +1,5 @@
 """The Ecowitt Weather Station Component."""
-# import asyncio
+import asyncio
 import logging
 import time
 
@@ -52,6 +52,8 @@ from .const import (
     W_TYPE_NEW,
     W_TYPE_OLD,
     W_TYPE_HYBRID,
+    REG_ENTITIES,
+    NEW_ENTITIES,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -76,8 +78,9 @@ CONFIG_SCHEMA = vol.Schema({DOMAIN: COMPONENT_SCHEMA}, extra=vol.ALLOW_EXTRA)
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
-    """Configure the Ecowitt component using flow only."""
-    hass.data[DOMAIN] = {}
+    """Configure the Ecowitt component using YAML."""
+    _LOGGER.warning("async_setup")
+    hass.data.setdefault(DOMAIN, {})
 
     if DOMAIN in config:
         hass.async_create_task(
@@ -89,26 +92,32 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    """Set up the Ecowitt component from a config entry."""
+    """Set up the Ecowitt component from UI."""
 
-    sensor_sensors = []
-    binary_sensors = []
+    _LOGGER.warning("async_setup_entry")
+    if hass.data.get(DOMAIN) is None:
+        hass.data.setdefault(DOMAIN, {})
 
     # Store config
     _LOGGER.error(entry.entry_id)
     hass.data[DOMAIN][entry.entry_id] = {}
-    hass.data[DOMAIN][entry.entry_id][DATA_STATION] = {}
-    hass.data[DOMAIN][entry.entry_id][DATA_READY] = False
+    ecowitt_data = hass.data[DOMAIN][entry.entry_id]
+    ecowitt_data[DATA_STATION] = {}
+    ecowitt_data[DATA_READY] = False
+    for et in [REG_ENTITIES, NEW_ENTITIES]:
+        ecowitt_data[et] = {}
+        for pl in ECOWITT_PLATFORMS:
+            ecowitt_data[et][pl] = []
 
     # preload some model info
-    stationinfo = hass.data[DOMAIN][entry.entry_id][DATA_STATION]
+    stationinfo = ecowitt_data[DATA_STATION]
     stationinfo[DATA_STATIONTYPE] = "Unknown"
     stationinfo[DATA_FREQ] = "Unknown"
     stationinfo[DATA_MODEL] = "Unknown"
 
     # setup the base connection
     ws = EcoWittListener(port=entry.data[CONF_PORT])
-    hass.data[DOMAIN][entry.entry_id][DATA_ECOWITT] = ws
+    ecowitt_data[DATA_ECOWITT] = ws
 
     if entry.data[CONF_UNIT_WINDCHILL] == W_TYPE_OLD:
         ws.set_windchill(WINDCHILL_OLD)
@@ -162,22 +171,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         return True
 
     def check_and_append_sensor(sensor):
-        """Check the sensor for validity, and append to appropriate list."""
+        """Check the sensor for validity, and append to new entitiy list."""
         if sensor not in SENSOR_TYPES:
             if sensor not in IGNORED_SENSORS:
                 _LOGGER.warning("Unhandled sensor type %s", sensor)
-            return None
+            return False
 
         # Is this a metric or imperial sensor, lookup and skip
         if not check_imp_metric_sensor(sensor):
-            return None
+            return False
 
         name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
-        if kind == TYPE_SENSOR:
-            sensor_sensors.append(sensor)
-        if kind == TYPE_BINARY_SENSOR:
-            binary_sensors.append(sensor)
-        return(kind)
+        ecowitt_data[NEW_ENTITIES][kind].append(sensor)
+        return True
 
     async def _first_data_rec(weather_data):
         _LOGGER.info("First ecowitt data recd, setting up sensors.")
@@ -200,27 +206,30 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
         # load the sensors we have
         for sensor in ws.last_values.keys():
+            _LOGGER.warning("check sensor " + sensor)
             check_and_append_sensor(sensor)
 
-        if not sensor_sensors and not binary_sensors:
+        if (not ecowitt_data[NEW_ENTITIES][TYPE_SENSOR]
+                and not ecowitt_data[NEW_ENTITIES][TYPE_BINARY_SENSOR]):
             _LOGGER.error("No sensors found to monitor, check device config.")
             return False
 
-        if sensor_sensors:
+        _LOGGER.warning("calling load_platform")
+        _LOGGER.warning(entry.data)
+        _LOGGER.warning(entry)
+
+        for component in ECOWITT_PLATFORMS:
+            _LOGGER.warning("calling fes for " + component)
             hass.async_create_task(
-                async_load_platform(hass, "sensor", DOMAIN, sensor_sensors,
-                                    entry.data)
+                hass.config_entries.async_forward_entry_setup(entry, component)
             )
-        if binary_sensors:
-            hass.async_create_task(
-                async_load_platform(hass, "binary_sensor", DOMAIN, binary_sensors,
-                                    entry.data)
-            )
-        hass.data[DOMAIN][entry.entry_id][DATA_READY] = True
+
+        ecowitt_data[DATA_READY] = True
 
     async def _async_ecowitt_update_cb(weather_data):
         """Primary update callback called from pyecowitt."""
         _LOGGER.debug("Primary update callback triggered.")
+        _LOGGER.warning("update cb called for id=" + entry.entry_id)
         if not hass.data[DOMAIN][entry.entry_id][DATA_READY]:
             await _first_data_rec(weather_data)
             return
@@ -229,44 +238,57 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 if sensor not in IGNORED_SENSORS:
                     _LOGGER.warning("Unhandled sensor type %s value %s, "
                                     + "file a PR.", sensor, weather_data[sensor])
-            elif (sensor not in sensor_sensors
-                  and sensor not in binary_sensors
+            elif (sensor not in ecowitt_data[REG_ENTITIES][TYPE_SENSOR]
+                  and sensor not in ecowitt_data[REG_ENTITIES][TYPE_BINARY_SENSOR]
                   and sensor not in IGNORED_SENSORS
                   and check_imp_metric_sensor(sensor)):
                 _LOGGER.warning("Unregistered sensor type %s value %s received.",
                                 sensor, weather_data[sensor])
                 # try to register the sensor
-                new_sensor = []
-                new_sensor.append(sensor)
-                kind = check_and_append_sensor(sensor)
-                if kind == TYPE_SENSOR:
-                    hass.async_create_task(
-                        async_load_platform(hass, "sensor", DOMAIN,
-                                            new_sensor, entry.data)
-                    )
-                if kind == TYPE_BINARY_SENSOR:
-                    hass.async_create_task(
-                        async_load_platform(hass, "binary_sensor", DOMAIN,
-                                            new_sensor, entry.data)
-                    )
-
+                if check_and_append_sensor(sensor):
+                    for component in ECOWITT_PLATFORMS:
+                        hass.async_create_task(
+                            hass.config_entries.async_forward_entry_setup(
+                                entry, component
+                            )
+                        )
         async_dispatcher_send(hass, DOMAIN)
 
+    # this is part of the base async_setup_entry
     ws.register_listener(_async_ecowitt_update_cb)
-
     return True
+
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Unload a config entry."""
+
+    ws = hass.data[DOMAIN][entry.entry_id][DATA_ECOWITT]
+    await ws.stop()
+
+    unload_ok = all(
+        await asyncio.gather(
+            *[
+                hass.config_entries.async_forward_entry_unload(entry, component)
+                for component in ECOWITT_PLATFORMS
+            ]
+        )
+    )
+    if unload_ok:
+        hass.data[DOMAIN].pop(entry.entry_id)
+
+    return unload_ok
 
 
 class EcowittEntity(Entity):
     """Base class for Ecowitt Weather Station."""
 
-    def __init__(self, hass, key, name):
+    def __init__(self, hass, entry, key, name):
         """Construct the entity."""
         self.hass = hass
         self._key = key
         self._name = name
-        self._stationinfo = hass.data[DOMAIN][DATA_STATION]
-        self._ws = hass.data[DOMAIN][DATA_ECOWITT]
+        self._stationinfo = hass.data[DOMAIN][entry.entry_id][DATA_STATION]
+        self._ws = hass.data[DOMAIN][entry.entry_id][DATA_ECOWITT]
 
     @property
     def should_poll(self):

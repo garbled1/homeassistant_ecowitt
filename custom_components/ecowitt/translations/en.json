@@ -13,13 +13,12 @@
 	    "initial_options": {
 		"title": "Ecowitt Parameters",
 		"data": {
-		    "name": "Device Name",
 		    "port": "Listening port",
-		    "baro_unit": "Barometer Unit",
-		    "wind_unit": "Wind Unit",
-		    "rain_unit": "Rainfall Unit",
-		    "lightning_unit": "Lightning distance unit",
-		    "windchill_unit": "Windchill calculation"
+		    "barounit": "Barometer Unit",
+		    "windunit": "Wind Unit",
+		    "rainunit": "Rainfall Unit",
+		    "lightningunit": "Lightning distance unit",
+		    "windchillunit": "Windchill calculation"
 		}
 	    }
 	}

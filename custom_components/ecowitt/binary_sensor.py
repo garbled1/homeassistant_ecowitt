@@ -1,44 +1,43 @@
 """Support for Ecowitt Weather Stations."""
 import logging
 
-from . import (
+from . import EcowittEntity
+from .const import (
+    DOMAIN,
     TYPE_BINARY_SENSOR,
     SENSOR_TYPES,
-    EcowittEntity,
+    REG_ENTITIES,
+    NEW_ENTITIES,
 )
+
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(hass, config, async_add_entities,
-                               discovery_info=None):
-    """Setup a single Ecowitt sensor."""
-
-    if not discovery_info:
-        return
-
+async def async_setup_entry(hass, entry, async_add_entities):
+    """Add sensors if new."""
+    ecowitt_data = hass.data[DOMAIN][entry.entry_id]
+    new_ent = ecowitt_data[NEW_ENTITIES][TYPE_BINARY_SENSOR]
+    reg_ent = ecowitt_data[REG_ENTITIES][TYPE_BINARY_SENSOR]
     entities = []
-    for sensor in discovery_info:
-        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
-        if kind == TYPE_BINARY_SENSOR:
-            entities.append(
-                EcowittBinarySensor(
-                    hass,
-                    sensor,
-                    name,
-                    device_class,
-                    uom,
-                    icon,
-                )
-            )
+
+    for new_entity in new_ent:
+        if new_entity in reg_ent:
+            continue
+        reg_ent.append(new_entity)
+        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[new_entity]
+        entities.append(EcowittBinarySensor(hass, entry, new_entity, name,
+                                            device_class, uom, icon))
+    # clear the list
+    new_ent = []
     async_add_entities(entities, True)
 
 
 class EcowittBinarySensor(EcowittEntity):
 
-    def __init__(self, hass, key, name, dc, uom, icon):
+    def __init__(self, hass, entry, key, name, dc, uom, icon):
         """Initialize the sensor."""
-        super().__init__(hass, key, name)
+        super().__init__(hass, entry, key, name)
         self._icon = icon
         self._uom = uom
         self._dc = dc

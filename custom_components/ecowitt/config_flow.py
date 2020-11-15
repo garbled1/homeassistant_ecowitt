@@ -61,11 +61,28 @@ DATA_SCHEMA = vol.Schema(
                      default=W_TYPE_HYBRID): vol.In(WINDCHILL_OPTS),
     }
 )
+OPTIONS_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_UNIT_BARO,
+                     default=CONF_UNIT_SYSTEM_METRIC): vol.In(UNIT_OPTS),
+        vol.Optional(CONF_UNIT_WIND,
+                     default=CONF_UNIT_SYSTEM_IMPERIAL): vol.In(UNIT_OPTS),
+        vol.Optional(CONF_UNIT_RAIN,
+                     default=CONF_UNIT_SYSTEM_IMPERIAL): vol.In(UNIT_OPTS),
+        vol.Optional(CONF_UNIT_LIGHTNING,
+                     default=CONF_UNIT_SYSTEM_IMPERIAL): vol.In(UNIT_OPTS),
+        vol.Optional(CONF_UNIT_WINDCHILL,
+                     default=W_TYPE_HYBRID): vol.In(WINDCHILL_OPTS),
+    }
+)
 
 
 async def validate_input(hass: core.HomeAssistant, data):
     """Validate user input."""
     for entry in hass.config_entries.async_entries(DOMAIN):
+        _LOGGER.warning(entry.data[CONF_PORT])
+        _LOGGER.warning(data[CONF_PORT])
+        _LOGGER.warning(data)
         if entry.data[CONF_PORT] == data[CONF_PORT]:
             raise AlreadyConfigured
     return {"title": f"Ecowitt on port {data[CONF_PORT]}"}
@@ -79,6 +96,11 @@ class EcowittConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_import(self, device_config):
         """Import a configuration.yaml config, if any."""
+        try:
+            await validate_input(self.hass, device_config)
+        except AlreadyConfigured:
+            return self.async_abort(reason="already_configured")
+
         port = device_config[CONF_PORT]
         return self.async_create_entry(
             title=f"Ecowitt on port {port}",
