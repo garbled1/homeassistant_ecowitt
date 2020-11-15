@@ -13,7 +13,15 @@
 	    "initial_options": {
 		"title": "Ecowitt Parameters",
 		"data": {
-		    "port": "Listening port",
+		    "port": "Listening port"
+		}
+	    }
+	}
+    },
+    "options": {
+	"step": {
+	    "init": {
+		"data": {
 		    "barounit": "Barometer Unit",
 		    "windunit": "Wind Unit",
 		    "rainunit": "Rainfall Unit",

@@ -73,6 +73,6 @@ class EcowittSensor(EcowittEntity):
         return self._icon
 
     @property
-    def device_info(self):
+    def device_class(self):
         """Return the device class."""
         return self._dc

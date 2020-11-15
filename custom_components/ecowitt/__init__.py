@@ -13,7 +13,6 @@ import voluptuous as vol
 
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import (
     async_dispatcher_connect,
@@ -33,8 +32,8 @@ from .const import (
     CONF_UNIT_RAIN,
     CONF_UNIT_WINDCHILL,
     CONF_UNIT_LIGHTNING,
+    CONF_NAME,
     DOMAIN,
-    DATA_CONFIG,
     DATA_ECOWITT,
     DATA_STATION,
     DATA_PASSKEY,
@@ -42,6 +41,7 @@ from .const import (
     DATA_FREQ,
     DATA_MODEL,
     DATA_READY,
+    DATA_OPTIONS,
     ECOWITT_PLATFORMS,
     IGNORED_SENSORS,
     S_IMPERIAL,
@@ -83,9 +83,21 @@ async def async_setup(hass: HomeAssistant, config: dict):
     hass.data.setdefault(DOMAIN, {})
 
     if DOMAIN in config:
+        data = {
+            CONF_PORT: config[DOMAIN][CONF_PORT],
+            CONF_NAME: None,
+        }
+        # set the options for migration
+        hass.data[DOMAIN][DATA_OPTIONS] = {
+            CONF_UNIT_BARO: config[DOMAIN][CONF_UNIT_BARO],
+            CONF_UNIT_WIND: config[DOMAIN][CONF_UNIT_WIND],
+            CONF_UNIT_RAIN: config[DOMAIN][CONF_UNIT_RAIN],
+            CONF_UNIT_LIGHTNING: config[DOMAIN][CONF_UNIT_LIGHTNING],
+            CONF_UNIT_WINDCHILL: config[DOMAIN][CONF_UNIT_WINDCHILL],
+        }
         hass.async_create_task(
             hass.config_entries.flow.async_init(
-                DOMAIN, context={"source": SOURCE_IMPORT}, data=config[DOMAIN]
+                DOMAIN, context={"source": SOURCE_IMPORT}, data=data
             )
         )
     return True
@@ -98,6 +110,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
 
+    # if options existed in the YAML but not in the config entry, add
+    if (not entry.options
+            and entry.source == SOURCE_IMPORT
+            and hass.data.get(DOMAIN)
+            and hass.data[DOMAIN].get(DATA_OPTIONS)):
+        hass.config_entries.async_update_entry(
+            entry=entry,
+            options=hass.data[DOMAIN][DATA_OPTIONS],
+        )
+
     # Store config
     _LOGGER.error(entry.entry_id)
     hass.data[DOMAIN][entry.entry_id] = {}
@@ -109,6 +131,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         for pl in ECOWITT_PLATFORMS:
             ecowitt_data[et][pl] = []
 
+    if not entry.options:
+        entry.options = {
+            CONF_UNIT_BARO: CONF_UNIT_SYSTEM_METRIC,
+            CONF_UNIT_WIND: CONF_UNIT_SYSTEM_IMPERIAL,
+            CONF_UNIT_RAIN: CONF_UNIT_SYSTEM_IMPERIAL,
+            CONF_UNIT_LIGHTNING: CONF_UNIT_SYSTEM_IMPERIAL,
+            CONF_UNIT_WINDCHILL: W_TYPE_HYBRID,
+        }
+
     # preload some model info
     stationinfo = ecowitt_data[DATA_STATION]
     stationinfo[DATA_STATIONTYPE] = "Unknown"
@@ -119,11 +150,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     ws = EcoWittListener(port=entry.data[CONF_PORT])
     ecowitt_data[DATA_ECOWITT] = ws
 
-    if entry.data[CONF_UNIT_WINDCHILL] == W_TYPE_OLD:
+    if entry.options[CONF_UNIT_WINDCHILL] == W_TYPE_OLD:
         ws.set_windchill(WINDCHILL_OLD)
-    if entry.data[CONF_UNIT_WINDCHILL] == W_TYPE_NEW:
+    if entry.options[CONF_UNIT_WINDCHILL] == W_TYPE_NEW:
         ws.set_windchill(WINDCHILL_NEW)
-    if entry.data[CONF_UNIT_WINDCHILL] == W_TYPE_HYBRID:
+    if entry.options[CONF_UNIT_WINDCHILL] == W_TYPE_HYBRID:
         ws.set_windchill(WINDCHILL_HYBRID)
 
     hass.loop.create_task(ws.listen())
@@ -142,31 +173,31 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         # Is this a metric or imperial sensor, lookup and skip
         name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
         if "baro" in sensor:
-            if (entry.data[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL
+            if (entry.options[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL
                     and metric == S_METRIC):
                 return False
-            if (entry.data[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC
+            if (entry.options[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_METRIC
                     and metric == S_IMPERIAL):
                 return False
         if "rain" in sensor:
-            if (entry.data[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL
+            if (entry.options[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_IMPERIAL
                     and metric == S_METRIC):
                 return False
-            if (entry.data[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC
+            if (entry.options[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC
                     and metric == S_IMPERIAL):
                 return False
         if "wind" in sensor:
-            if (entry.data[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL
+            if (entry.options[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL
                     and metric == S_METRIC):
                 return False
-            if (entry.data[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC
+            if (entry.options[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC
                     and metric == S_IMPERIAL):
                 return False
         if (sensor == 'lightning'
-                and entry.data[CONF_UNIT_LIGHTNING] == CONF_UNIT_SYSTEM_IMPERIAL):
+                and entry.options[CONF_UNIT_LIGHTNING] == CONF_UNIT_SYSTEM_IMPERIAL):
             return False
         if (sensor == 'lightning_mi'
-                and entry.data[CONF_UNIT_LIGHTNING] == CONF_UNIT_SYSTEM_METRIC):
+                and entry.options[CONF_UNIT_LIGHTNING] == CONF_UNIT_SYSTEM_METRIC):
             return False
         return True
 
@@ -308,10 +339,15 @@ class EcowittEntity(Entity):
     @property
     def device_info(self):
         """Return device information for this sensor."""
+        _LOGGER.warning("devinfo called")
         return {
-            "station": self._stationinfo[DATA_STATIONTYPE],
+            "identifiers": {(DOMAIN, self._stationinfo[DATA_PASSKEY])},
+            "name": self.entry.data[CONF_NAME],
+            "manufacturer": DOMAIN,
             "model": self._stationinfo[DATA_MODEL],
-            "frequency": self._stationinfo[DATA_FREQ],
+            "sw_version": self._stationinfo[DATA_STATIONTYPE],
+            "via_device": (DOMAIN, self._stationinfo[DATA_STATIONTYPE]),
+            # "frequency": self._stationinfo[DATA_FREQ],
         }
 
     async def async_added_to_hass(self):

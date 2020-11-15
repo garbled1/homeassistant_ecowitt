@@ -1,16 +1,9 @@
 """Config flow for ecowitt."""
 import logging
 
-from pyecowitt import (
-    EcoWittListener,
-    WINDCHILL_OLD,
-    WINDCHILL_NEW,
-    WINDCHILL_HYBRID,
-)
-
 import voluptuous as vol
-import homeassistant.helpers.config_validation as cv
 from homeassistant import config_entries, core, exceptions
+from homeassistant.core import callback
 
 from homeassistant.const import (
     CONF_PORT,
@@ -19,62 +12,23 @@ from homeassistant.const import (
 )
 
 from .const import (
-    CONF_NAME,
     CONF_UNIT_BARO,
     CONF_UNIT_WIND,
     CONF_UNIT_RAIN,
     CONF_UNIT_WINDCHILL,
     CONF_UNIT_LIGHTNING,
-    DEFAULT_PORT,
     DOMAIN,
-    DATA_CONFIG,
-    DATA_ECOWITT,
-    DATA_STATION,
-    DATA_PASSKEY,
-    DATA_STATIONTYPE,
-    DATA_FREQ,
-    DATA_MODEL,
-    DATA_READY,
-    W_TYPE_NEW,
-    W_TYPE_OLD,
     W_TYPE_HYBRID,
+    UNIT_OPTS,
+    WINDCHILL_OPTS
 )
 
-UNIT_OPTS = [CONF_UNIT_SYSTEM_METRIC, CONF_UNIT_SYSTEM_IMPERIAL]
-WINDCHILL_OPTS = [W_TYPE_HYBRID, W_TYPE_NEW, W_TYPE_OLD]
+from .schemas import (
+    DATA_SCHEMA,
+)
 
 
 _LOGGER = logging.getLogger(__name__)
-
-DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_PORT, default=DEFAULT_PORT): cv.port,
-        vol.Optional(CONF_UNIT_BARO,
-                     default=CONF_UNIT_SYSTEM_METRIC): vol.In(UNIT_OPTS),
-        vol.Optional(CONF_UNIT_WIND,
-                     default=CONF_UNIT_SYSTEM_IMPERIAL): vol.In(UNIT_OPTS),
-        vol.Optional(CONF_UNIT_RAIN,
-                     default=CONF_UNIT_SYSTEM_IMPERIAL): vol.In(UNIT_OPTS),
-        vol.Optional(CONF_UNIT_LIGHTNING,
-                     default=CONF_UNIT_SYSTEM_IMPERIAL): vol.In(UNIT_OPTS),
-        vol.Optional(CONF_UNIT_WINDCHILL,
-                     default=W_TYPE_HYBRID): vol.In(WINDCHILL_OPTS),
-    }
-)
-OPTIONS_SCHEMA = vol.Schema(
-    {
-        vol.Optional(CONF_UNIT_BARO,
-                     default=CONF_UNIT_SYSTEM_METRIC): vol.In(UNIT_OPTS),
-        vol.Optional(CONF_UNIT_WIND,
-                     default=CONF_UNIT_SYSTEM_IMPERIAL): vol.In(UNIT_OPTS),
-        vol.Optional(CONF_UNIT_RAIN,
-                     default=CONF_UNIT_SYSTEM_IMPERIAL): vol.In(UNIT_OPTS),
-        vol.Optional(CONF_UNIT_LIGHTNING,
-                     default=CONF_UNIT_SYSTEM_IMPERIAL): vol.In(UNIT_OPTS),
-        vol.Optional(CONF_UNIT_WINDCHILL,
-                     default=W_TYPE_HYBRID): vol.In(WINDCHILL_OPTS),
-    }
-)
 
 
 async def validate_input(hass: core.HomeAssistant, data):
@@ -129,6 +83,60 @@ class EcowittConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="initial_options", data_schema=DATA_SCHEMA, errors=errors
         )
 
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        return EcowittOptionsFlowHandler(config_entry)
+
 
 class AlreadyConfigured(exceptions.HomeAssistantError):
     """Error to indicate this device is already configured."""
+
+
+class EcowittOptionsFlowHandler(config_entries.OptionsFlow):
+    """Ecowitt config flow options handler."""
+
+    def __init__(self, config_entry):
+        """Initialize HASS options flow."""
+        self.config_entry = config_entry
+
+    async def async_step_init(self, user_input=None):
+        """Handle a flow initialized by the user."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        options_schema = vol.Schema(
+            {
+                vol.Optional(
+                    CONF_UNIT_BARO,
+                    default=self.config_entry.options.get(
+                        CONF_UNIT_BARO, CONF_UNIT_SYSTEM_METRIC,
+                    ),
+                ): vol.In(UNIT_OPTS),
+                vol.Optional(
+                    CONF_UNIT_WIND,
+                    default=self.config_entry.options.get(
+                        CONF_UNIT_WIND, CONF_UNIT_SYSTEM_IMPERIAL,
+                    ),
+                ): vol.In(UNIT_OPTS),
+                vol.Optional(
+                    CONF_UNIT_RAIN,
+                    default=self.config_entry.options.get(
+                        CONF_UNIT_RAIN, CONF_UNIT_SYSTEM_IMPERIAL,
+                    ),
+                ): vol.In(UNIT_OPTS),
+                vol.Optional(
+                    CONF_UNIT_LIGHTNING,
+                    default=self.config_entry.options.get(
+                        CONF_UNIT_LIGHTNING, CONF_UNIT_SYSTEM_IMPERIAL,
+                    ),
+                ): vol.In(UNIT_OPTS),
+                vol.Optional(
+                    CONF_UNIT_WINDCHILL,
+                    default=self.config_entry.options.get(
+                        CONF_UNIT_WINDCHILL, W_TYPE_HYBRID,
+                    ),
+                ): vol.In(WINDCHILL_OPTS),
+            }
+        )
+        return self.async_show_form(step_id="init", data_schema=options_schema)

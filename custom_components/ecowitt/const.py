@@ -1,6 +1,8 @@
 """Constants used by ecowitt component."""
 
 from homeassistant.const import (
+    CONF_UNIT_SYSTEM_METRIC,
+    CONF_UNIT_SYSTEM_IMPERIAL,
     DEGREE,
     CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
     POWER_WATT,
@@ -36,6 +38,7 @@ TYPE_SENSOR = "sensor"
 TYPE_BINARY_SENSOR = "binary_sensor"
 DOMAIN = "ecowitt"
 DATA_CONFIG = "config"
+DATA_OPTIONS = "options"
 DATA_ECOWITT = "ecowitt_listener"
 DATA_STATION = "station"
 DATA_PASSKEY = "PASSKEY"
@@ -190,6 +193,10 @@ W_TYPE_OLD = "old"
 W_TYPE_HYBRID = "hybrid"
 
 LEAK_DETECTED = "Leak Detected"
+
+UNIT_OPTS = [CONF_UNIT_SYSTEM_METRIC, CONF_UNIT_SYSTEM_IMPERIAL]
+WINDCHILL_OPTS = [W_TYPE_HYBRID, W_TYPE_NEW, W_TYPE_OLD]
+
 
 # Name, unit_of_measure, type, device_class, icon, metric=1
 # name, uom, kind, device_class, icon, metric = SENSOR_TYPES[x]
