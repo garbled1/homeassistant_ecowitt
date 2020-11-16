@@ -58,24 +58,6 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-COMPONENT_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_PORT): cv.port,
-        vol.Optional(CONF_UNIT_BARO,
-                     default=CONF_UNIT_SYSTEM_METRIC): cv.string,
-        vol.Optional(CONF_UNIT_WIND,
-                     default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
-        vol.Optional(CONF_UNIT_RAIN,
-                     default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
-        vol.Optional(CONF_UNIT_LIGHTNING,
-                     default=CONF_UNIT_SYSTEM_IMPERIAL): cv.string,
-        vol.Optional(CONF_UNIT_WINDCHILL,
-                     default=W_TYPE_HYBRID): cv.string,
-    }
-)
-
-CONFIG_SCHEMA = vol.Schema({DOMAIN: COMPONENT_SCHEMA}, extra=vol.ALLOW_EXTRA)
-
 
 async def async_setup(hass: HomeAssistant, config: dict):
     """Configure the Ecowitt component using YAML."""
@@ -320,6 +302,7 @@ class EcowittEntity(Entity):
         self._name = name
         self._stationinfo = hass.data[DOMAIN][entry.entry_id][DATA_STATION]
         self._ws = hass.data[DOMAIN][entry.entry_id][DATA_ECOWITT]
+        self._entry = entry
 
     @property
     def should_poll(self):
@@ -339,10 +322,14 @@ class EcowittEntity(Entity):
     @property
     def device_info(self):
         """Return device information for this sensor."""
-        _LOGGER.warning("devinfo called")
+        if self._entry.data[CONF_NAME] != '':
+            dname = self._entry.data[CONF_NAME]
+        else:
+            dname = "DOMAIN"
+
         return {
             "identifiers": {(DOMAIN, self._stationinfo[DATA_PASSKEY])},
-            "name": self.entry.data[CONF_NAME],
+            "name": dname,
             "manufacturer": DOMAIN,
             "model": self._stationinfo[DATA_MODEL],
             "sw_version": self._stationinfo[DATA_STATIONTYPE],
@@ -357,7 +344,7 @@ class EcowittEntity(Entity):
     @callback
     def _update_callback(self) -> None:
         """Call from dispatcher when state changes."""
-        _LOGGER.debug("Updating state with new data. %s", self._name)
+        _LOGGER.warning("Updating state with new data. %s", self._name)
         self.async_schedule_update_ha_state(force_refresh=True)
 
     @property

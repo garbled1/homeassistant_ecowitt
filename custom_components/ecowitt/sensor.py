@@ -51,6 +51,7 @@ class EcowittSensor(EcowittEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
+        _LOGGER.warning("sensor: request for " + self._key)
         if self._key in self._ws.last_values:
             # The lightning time is reported in UTC, hooray.
             if self._dc == DEVICE_CLASS_TIMESTAMP:

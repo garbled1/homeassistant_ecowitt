@@ -3,13 +3,14 @@ import logging
 
 from . import EcowittEntity
 from .const import (
+    DATA_ECOWITT,
     DOMAIN,
     TYPE_BINARY_SENSOR,
     SENSOR_TYPES,
     REG_ENTITIES,
     NEW_ENTITIES,
 )
-
+from homeassistant.components.binary_sensor import BinarySensorEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         if new_entity in reg_ent:
             continue
         reg_ent.append(new_entity)
+        _LOGGER.warning(TYPE_BINARY_SENSOR + " " + new_entity)
         name, uom, kind, device_class, icon, metric = SENSOR_TYPES[new_entity]
         entities.append(EcowittBinarySensor(hass, entry, new_entity, name,
                                             device_class, uom, icon))
@@ -33,7 +35,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     async_add_entities(entities, True)
 
 
-class EcowittBinarySensor(EcowittEntity):
+class EcowittBinarySensor(EcowittEntity, BinarySensorEntity):
 
     def __init__(self, hass, entry, key, name, dc, uom, icon):
         """Initialize the sensor."""
@@ -45,7 +47,8 @@ class EcowittBinarySensor(EcowittEntity):
     @property
     def is_on(self):
         """Return true if the binary sensor is on."""
-        if self._key in self._ws_last_values:
+        _LOGGER.warning("hello sensor")
+        if self._key in self._ws.last_values:
             if self._ws.last_values[self._key] > 0:
                 return True
         else:
