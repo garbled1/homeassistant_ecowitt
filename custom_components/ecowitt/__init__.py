@@ -333,7 +333,8 @@ class EcowittEntity(Entity):
     @property
     def device_info(self):
         """Return device information for this sensor."""
-        if self._entry.data[CONF_NAME] != '':
+        if (self._entry.data[CONF_NAME] != ''
+                and self._entry.data[CONF_NAME] is not None):
             dname = self._entry.data[CONF_NAME]
         else:
             dname = DOMAIN
