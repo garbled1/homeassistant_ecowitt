@@ -56,10 +56,10 @@ class EcowittBinarySensor(EcowittEntity, BinarySensorEntity):
                             self._key)
         return False
 
-    @property
-    def icon(self):
-        """Return the icon to use in the fronend."""
-        return self._icon
+    # @property
+    # def icon(self):
+    #     """Return the icon to use in the fronend."""
+    #     return self._icon
 
     @property
     def device_class(self):
