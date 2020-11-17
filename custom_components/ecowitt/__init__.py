@@ -69,6 +69,17 @@ async def async_setup(hass: HomeAssistant, config: dict):
             CONF_PORT: config[DOMAIN][CONF_PORT],
             CONF_NAME: None,
         }
+        # set defaults if not set in conf
+        if CONF_UNIT_BARO not in config[DOMAIN]:
+            config[DOMAIN][CONF_UNIT_BARO] = CONF_UNIT_SYSTEM_METRIC
+        if CONF_UNIT_WIND not in config[DOMAIN]:
+            config[DOMAIN][CONF_UNIT_WIND] = CONF_UNIT_SYSTEM_IMPERIAL
+        if CONF_UNIT_RAIN not in config[DOMAIN]:
+            config[DOMAIN][CONF_UNIT_RAIN] = CONF_UNIT_SYSTEM_IMPERIAL
+        if CONF_UNIT_LIGHTNING not in config[DOMAIN]:
+            config[DOMAIN][CONF_UNIT_LIGHTNING] = CONF_UNIT_SYSTEM_IMPERIAL
+        if CONF_UNIT_WINDCHILL not in config[DOMAIN]:
+            config[DOMAIN][CONF_UNIT_WINDCHILL] = W_TYPE_HYBRID
         # set the options for migration
         hass.data[DOMAIN][DATA_OPTIONS] = {
             CONF_UNIT_BARO: config[DOMAIN][CONF_UNIT_BARO],
