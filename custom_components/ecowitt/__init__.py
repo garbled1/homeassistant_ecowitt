@@ -336,7 +336,7 @@ class EcowittEntity(Entity):
         if self._entry.data[CONF_NAME] != '':
             dname = self._entry.data[CONF_NAME]
         else:
-            dname = "DOMAIN"
+            dname = DOMAIN
 
         return {
             "identifiers": {(DOMAIN, self._stationinfo[DATA_PASSKEY])},
