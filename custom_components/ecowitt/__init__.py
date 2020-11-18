@@ -290,9 +290,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 if check_and_append_sensor(sensor):
                     name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
                     new_sensors[kind].append(sensor)
-                    for component in ECOWITT_PLATFORMS:
-                        signal = f"{SIGNAL_ADD_ENTITIES}_{component}"
-                        async_dispatcher_send(hass, signal, new_sensors[kind])
+        for component in ECOWITT_PLATFORMS:
+            if new_sensors[component]:
+                signal = f"{SIGNAL_ADD_ENTITIES}_{component}"
+                async_dispatcher_send(hass, signal, new_sensors[component])
         async_dispatcher_send(hass, DOMAIN)
 
     # this is part of the base async_setup_entry
