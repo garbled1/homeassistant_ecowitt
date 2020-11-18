@@ -53,6 +53,7 @@ class EcowittBinarySensor(EcowittEntity, BinarySensorEntity):
     @property
     def state(self):
         """Return the state of the binary sensor."""
+        # Don't claim a leak is cleared if the sensor is out of range
         if self.is_on is None:
             return STATE_UNKNOWN
         return STATE_ON if self.is_on else STATE_OFF

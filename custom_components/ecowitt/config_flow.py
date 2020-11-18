@@ -34,9 +34,6 @@ _LOGGER = logging.getLogger(__name__)
 async def validate_input(hass: core.HomeAssistant, data):
     """Validate user input."""
     for entry in hass.config_entries.async_entries(DOMAIN):
-        _LOGGER.warning(entry.data[CONF_PORT])
-        _LOGGER.warning(data[CONF_PORT])
-        _LOGGER.warning(data)
         if entry.data[CONF_PORT] == data[CONF_PORT]:
             raise AlreadyConfigured
     return {"title": f"Ecowitt on port {data[CONF_PORT]}"}

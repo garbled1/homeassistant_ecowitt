@@ -108,7 +108,6 @@ async def async_setup(hass: HomeAssistant, config: dict):
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up the Ecowitt component from UI."""
 
-    _LOGGER.warning("async_setup_entry")
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
 
@@ -123,7 +122,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         )
 
     # Store config
-    _LOGGER.error(entry.entry_id)
     hass.data[DOMAIN][entry.entry_id] = {}
     ecowitt_data = hass.data[DOMAIN][entry.entry_id]
     ecowitt_data[DATA_STATION] = {}
@@ -233,7 +231,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
         # load the sensors we have
         for sensor in ws.last_values.keys():
-            _LOGGER.warning("check sensor " + sensor)
             check_and_append_sensor(sensor)
 
         if (not ecowitt_data[REG_ENTITIES][TYPE_SENSOR]
@@ -241,12 +238,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             _LOGGER.error("No sensors found to monitor, check device config.")
             return False
 
-        _LOGGER.warning("calling load_platform")
-        _LOGGER.warning(entry.data)
-        _LOGGER.warning(entry)
-
         for component in ECOWITT_PLATFORMS:
-            _LOGGER.warning("calling fes for " + component)
             hass.async_create_task(
                 hass.config_entries.async_forward_entry_setup(entry, component)
             )
@@ -256,7 +248,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     async def _async_ecowitt_update_cb(weather_data):
         """Primary update callback called from pyecowitt."""
         _LOGGER.debug("Primary update callback triggered.")
-        _LOGGER.warning("update cb called for id=" + entry.entry_id)
 
         new_sensors = {}
         for component in ECOWITT_PLATFORMS:
@@ -316,8 +307,6 @@ def async_add_ecowitt_entities(hass, entry, entity_type,
                                platform, async_add_entities,
                                discovery_info):
     entities = []
-    _LOGGER.warning("Calling async_add_ecowitt_entities")
-    _LOGGER.warning(discovery_info)
     if discovery_info is None:
         return
 
@@ -384,7 +373,6 @@ class EcowittEntity(Entity):
     @callback
     def _update_callback(self) -> None:
         """Call from dispatcher when state changes."""
-        _LOGGER.warning("Updating state with new data. %s", self._name)
         self.async_schedule_update_ha_state(force_refresh=True)
 
     @property
