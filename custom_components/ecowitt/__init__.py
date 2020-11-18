@@ -9,10 +9,8 @@ from pyecowitt import (
     WINDCHILL_NEW,
     WINDCHILL_HYBRID,
 )
-import voluptuous as vol
 
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
-import homeassistant.helpers.config_validation as cv
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import (
     async_dispatcher_connect,
@@ -54,6 +52,7 @@ from .const import (
     W_TYPE_HYBRID,
     REG_ENTITIES,
     NEW_ENTITIES,
+    SIGNAL_ADD_ENTITIES,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -206,7 +205,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             return False
 
         name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
-        ecowitt_data[NEW_ENTITIES][kind].append(sensor)
+        ecowitt_data[REG_ENTITIES][kind].append(sensor)
         return True
 
     async def _first_data_rec(weather_data):
@@ -233,8 +232,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             _LOGGER.warning("check sensor " + sensor)
             check_and_append_sensor(sensor)
 
-        if (not ecowitt_data[NEW_ENTITIES][TYPE_SENSOR]
-                and not ecowitt_data[NEW_ENTITIES][TYPE_BINARY_SENSOR]):
+        if (not ecowitt_data[REG_ENTITIES][TYPE_SENSOR]
+                and not ecowitt_data[REG_ENTITIES][TYPE_BINARY_SENSOR]):
             _LOGGER.error("No sensors found to monitor, check device config.")
             return False
 
@@ -247,6 +246,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             hass.async_create_task(
                 hass.config_entries.async_forward_entry_setup(entry, component)
             )
+            # signal = f"{SIGNAL_ADD_ENTITIES}_{component}"
+            # async_dispatcher_send(hass, signal,
+            #                       ecowitt_data[REG_ENTITIES][component])
+            # _LOGGER.warning("called signal for component " + component)
+            # _LOGGER.warning(ecowitt_data[REG_ENTITIES][component])
 
         ecowitt_data[DATA_READY] = True
 
@@ -254,6 +258,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         """Primary update callback called from pyecowitt."""
         _LOGGER.debug("Primary update callback triggered.")
         _LOGGER.warning("update cb called for id=" + entry.entry_id)
+
+        new_sensors = {}
+        for component in ECOWITT_PLATFORMS:
+            new_sensors[component] = []
+
         if not hass.data[DOMAIN][entry.entry_id][DATA_READY]:
             await _first_data_rec(weather_data)
             return
@@ -270,12 +279,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                 sensor, weather_data[sensor])
                 # try to register the sensor
                 if check_and_append_sensor(sensor):
+                    name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
+                    new_sensors[kind].append(sensor)
                     for component in ECOWITT_PLATFORMS:
-                        hass.async_create_task(
-                            hass.config_entries.async_forward_entry_setup(
-                                entry, component
-                            )
-                        )
+                        signal = f"{SIGNAL_ADD_ENTITIES}_{component}"
+                        async_dispatcher_send(hass, signal, new_sensors[kind])
         async_dispatcher_send(hass, DOMAIN)
 
     # this is part of the base async_setup_entry
@@ -301,6 +309,25 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
+
+
+def async_add_ecowitt_entities(hass, entry, entity_type,
+                               platform, async_add_entities,
+                               discovery_info):
+    entities = []
+    _LOGGER.warning("Calling async_add_ecowitt_entities")
+    _LOGGER.warning(discovery_info)
+    if discovery_info is None:
+        return
+
+    for new_entity in discovery_info:
+        if new_entity not in hass.data[DOMAIN][entry.entry_id][REG_ENTITIES][platform]:
+            hass.data[DOMAIN][entry.entry_id][REG_ENTITIES][platform].append(new_entity)
+        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[new_entity]
+        entities.append(entity_type(hass, entry, new_entity, name,
+                                    device_class, uom, icon))
+    if entities:
+        async_add_entities(entities, True)
 
 
 class EcowittEntity(Entity):

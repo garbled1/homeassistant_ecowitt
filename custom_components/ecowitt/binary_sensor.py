@@ -1,7 +1,7 @@
 """Support for Ecowitt Weather Stations."""
 import logging
 
-from . import EcowittEntity
+from . import EcowittEntity, async_add_ecowitt_entities
 from .const import (
     DATA_ECOWITT,
     DOMAIN,
@@ -9,30 +9,46 @@ from .const import (
     SENSOR_TYPES,
     REG_ENTITIES,
     NEW_ENTITIES,
+    SIGNAL_ADD_ENTITIES,
 )
 from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
     """Add sensors if new."""
-    ecowitt_data = hass.data[DOMAIN][entry.entry_id]
-    new_ent = ecowitt_data[NEW_ENTITIES][TYPE_BINARY_SENSOR]
-    reg_ent = ecowitt_data[REG_ENTITIES][TYPE_BINARY_SENSOR]
-    entities = []
 
-    for new_entity in new_ent:
-        if new_entity in reg_ent:
-            continue
-        reg_ent.append(new_entity)
-        _LOGGER.warning(TYPE_BINARY_SENSOR + " " + new_entity)
-        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[new_entity]
-        entities.append(EcowittBinarySensor(hass, entry, new_entity, name,
-                                            device_class, uom, icon))
-    # clear the list
-    new_ent = []
-    async_add_entities(entities, True)
+    def add_entities(discovery_info=None):
+        async_add_ecowitt_entities(hass, entry, EcowittBinarySensor,
+                                   BINARY_SENSOR_DOMAIN, async_add_entities,
+                                   discovery_info)
+
+    signal = f"{SIGNAL_ADD_ENTITIES}_{BINARY_SENSOR_DOMAIN}"
+    async_dispatcher_connect(hass, signal, add_entities)
+    add_entities(hass.data[DOMAIN][entry.entry_id][REG_ENTITIES][TYPE_BINARY_SENSOR])
+
+
+# async def async_setup_entry(hass, entry, async_add_entities):
+#     """Add sensors if new."""
+#     ecowitt_data = hass.data[DOMAIN][entry.entry_id]
+#     new_ent = ecowitt_data[NEW_ENTITIES][TYPE_BINARY_SENSOR]
+#     reg_ent = ecowitt_data[REG_ENTITIES][TYPE_BINARY_SENSOR]
+#     entities = []
+
+#     for new_entity in new_ent:
+#         if new_entity in reg_ent:
+#             continue
+#         reg_ent.append(new_entity)
+#         _LOGGER.warning(TYPE_BINARY_SENSOR + " " + new_entity)
+#         name, uom, kind, device_class, icon, metric = SENSOR_TYPES[new_entity]
+#         entities.append(EcowittBinarySensor(hass, entry, new_entity, name,
+#                                             device_class, uom, icon))
+#     # clear the list
+#     new_ent = []
+#     async_add_entities(entities, True)
 
 
 class EcowittBinarySensor(EcowittEntity, BinarySensorEntity):

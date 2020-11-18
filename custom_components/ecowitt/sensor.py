@@ -2,13 +2,16 @@
 import logging
 import homeassistant.util.dt as dt_util
 
-from . import EcowittEntity
+from . import EcowittEntity, async_add_ecowitt_entities
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from .const import (
     DOMAIN,
     TYPE_SENSOR,
     SENSOR_TYPES,
     REG_ENTITIES,
     NEW_ENTITIES,
+    SIGNAL_ADD_ENTITIES,
 )
 
 from homeassistant.const import (
@@ -21,22 +24,19 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, entry, async_add_entities):
     """Add sensors if new."""
-    _LOGGER.warning("sensor setup entry called")
-    ecowitt_data = hass.data[DOMAIN][entry.entry_id]
-    new_ent = ecowitt_data[NEW_ENTITIES][TYPE_SENSOR]
-    reg_ent = ecowitt_data[REG_ENTITIES][TYPE_SENSOR]
-    entities = []
 
-    for new_entity in new_ent:
-        if new_entity in reg_ent:
-            continue
-        reg_ent.append(new_entity)
-        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[new_entity]
-        entities.append(EcowittSensor(hass, entry, new_entity, name,
-                                      device_class, uom, icon))
-    # clear the list
-    new_ent = []
-    async_add_entities(entities, True)
+    _LOGGER.warning("called async_setup_entry in sensor")
+
+    def add_entities(discovery_info=None):
+        _LOGGER.warning("called add_entities in sensor")
+        _LOGGER.warning(discovery_info)
+        async_add_ecowitt_entities(hass, entry, EcowittSensor,
+                                   SENSOR_DOMAIN, async_add_entities,
+                                   discovery_info)
+
+    signal = f"{SIGNAL_ADD_ENTITIES}_{SENSOR_DOMAIN}"
+    async_dispatcher_connect(hass, signal, add_entities)
+    add_entities(hass.data[DOMAIN][entry.entry_id][REG_ENTITIES][TYPE_SENSOR])
 
 
 class EcowittSensor(EcowittEntity):
