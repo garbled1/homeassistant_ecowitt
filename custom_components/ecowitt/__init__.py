@@ -164,11 +164,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         """ Close the ecowitt server."""
         await ws.stop()
 
-    # hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, close_server)
-
-    # # go to sleep until we get the first report
-    # await ws.wait_for_valid_data()
-
     def check_imp_metric_sensor(sensor):
         """Check if this is the wrong sensor for our config (imp/metric)."""
         # Is this a metric or imperial sensor, lookup and skip
@@ -187,7 +182,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             if (entry.options[CONF_UNIT_RAIN] == CONF_UNIT_SYSTEM_METRIC
                     and metric == S_IMPERIAL):
                 return False
-        if "wind" in sensor:
+        if "windchill" not in sensor and ("wind" in sensor or "gust" in sensor):
             if (entry.options[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL
                     and metric == S_METRIC):
                 return False
@@ -207,15 +202,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         if sensor not in SENSOR_TYPES:
             if sensor not in IGNORED_SENSORS:
                 _LOGGER.warning("Unhandled sensor type %s", sensor)
-            return False
+            return None
 
         # Is this a metric or imperial sensor, lookup and skip
         if not check_imp_metric_sensor(sensor):
-            return False
+            return None
 
         name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
         ecowitt_data[REG_ENTITIES][kind].append(sensor)
-        return True
+        return kind
 
     async def _first_data_rec(weather_data):
         _LOGGER.info("First ecowitt data recd, setting up sensors.")
@@ -255,11 +250,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             hass.async_create_task(
                 hass.config_entries.async_forward_entry_setup(entry, component)
             )
-            # signal = f"{SIGNAL_ADD_ENTITIES}_{component}"
-            # async_dispatcher_send(hass, signal,
-            #                       ecowitt_data[REG_ENTITIES][component])
-            # _LOGGER.warning("called signal for component " + component)
-            # _LOGGER.warning(ecowitt_data[REG_ENTITIES][component])
 
         ecowitt_data[DATA_READY] = True
 
@@ -287,9 +277,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 _LOGGER.warning("Unregistered sensor type %s value %s received.",
                                 sensor, weather_data[sensor])
                 # try to register the sensor
-                if check_and_append_sensor(sensor):
-                    name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
+                kind = check_and_append_sensor(sensor)
+                if kind is not None:
                     new_sensors[kind].append(sensor)
+        # if we have new sensors, set them up.
         for component in ECOWITT_PLATFORMS:
             if new_sensors[component]:
                 signal = f"{SIGNAL_ADD_ENTITIES}_{component}"

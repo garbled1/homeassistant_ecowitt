@@ -46,6 +46,7 @@ class EcowittBinarySensor(EcowittEntity, BinarySensorEntity):
         else:
             _LOGGER.warning("Sensor %s not in last update, check range or battery",
                             self._key)
+            return None
         return False
 
     @property
