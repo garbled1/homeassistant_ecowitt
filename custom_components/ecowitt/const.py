@@ -50,7 +50,6 @@ DATA_FREQ = "freq"
 DATA_MODEL = "model"
 DATA_READY = "ready"
 REG_ENTITIES = "registered"
-NEW_ENTITIES = "new"
 
 DEFAULT_PORT = 4199
 

@@ -8,9 +8,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from .const import (
     DOMAIN,
     TYPE_SENSOR,
-    SENSOR_TYPES,
     REG_ENTITIES,
-    NEW_ENTITIES,
     SIGNAL_ADD_ENTITIES,
 )
 
@@ -27,11 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, entry, async_add_entities):
     """Add sensors if new."""
 
-    _LOGGER.warning("called async_setup_entry in sensor")
-
     def add_entities(discovery_info=None):
-        _LOGGER.warning("called add_entities in sensor")
-        _LOGGER.warning(discovery_info)
         async_add_ecowitt_entities(hass, entry, EcowittSensor,
                                    SENSOR_DOMAIN, async_add_entities,
                                    discovery_info)
@@ -53,13 +47,13 @@ class EcowittSensor(EcowittEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        _LOGGER.warning("sensor: request for " + self._key)
         if self._key in self._ws.last_values:
             # The lightning time is reported in UTC, hooray.
             if self._dc == DEVICE_CLASS_TIMESTAMP:
                 return dt_util.as_local(
                     dt_util.utc_from_timestamp(self._ws.last_values[self._key])
                 ).isoformat()
+            # Battery value is 0-5
             if self._dc == DEVICE_CLASS_BATTERY and self._uom == PERCENTAGE:
                 return self._ws.last_values[self._key] * 20.0
             return self._ws.last_values[self._key]

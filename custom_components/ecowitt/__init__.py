@@ -51,16 +51,17 @@ from .const import (
     W_TYPE_OLD,
     W_TYPE_HYBRID,
     REG_ENTITIES,
-    NEW_ENTITIES,
     SIGNAL_ADD_ENTITIES,
 )
+
+NOTIFICATION_ID = DOMAIN
+NOTIFICATION_TITLE = "Ecowitt config migrated"
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
     """Configure the Ecowitt component using YAML."""
-    _LOGGER.warning("async_setup")
     hass.data.setdefault(DOMAIN, {})
 
     if DOMAIN in config:
@@ -87,6 +88,15 @@ async def async_setup(hass: HomeAssistant, config: dict):
             CONF_UNIT_LIGHTNING: config[DOMAIN][CONF_UNIT_LIGHTNING],
             CONF_UNIT_WINDCHILL: config[DOMAIN][CONF_UNIT_WINDCHILL],
         }
+        hass.components.persistent_notification.create(
+            "Ecowitt configuration has been migrated from yaml format "
+            "to a config_flow. Your options and settings should have been "
+            "migrated automatically.  Verify them in the Configuration -> "
+            "Integrations menu, and then delete the ecowitt section from "
+            "your yaml file.",
+            title=NOTIFICATION_TITLE,
+            notification_id=NOTIFICATION_ID,
+        )
         hass.async_create_task(
             hass.config_entries.flow.async_init(
                 DOMAIN, context={"source": SOURCE_IMPORT}, data=data
@@ -118,10 +128,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     ecowitt_data = hass.data[DOMAIN][entry.entry_id]
     ecowitt_data[DATA_STATION] = {}
     ecowitt_data[DATA_READY] = False
-    for et in [REG_ENTITIES, NEW_ENTITIES]:
-        ecowitt_data[et] = {}
-        for pl in ECOWITT_PLATFORMS:
-            ecowitt_data[et][pl] = []
+    ecowitt_data[REG_ENTITIES] = {}
+    for pl in ECOWITT_PLATFORMS:
+        ecowitt_data[REG_ENTITIES][pl] = []
 
     if not entry.options:
         entry.options = {
