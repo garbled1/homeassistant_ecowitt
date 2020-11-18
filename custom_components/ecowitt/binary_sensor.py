@@ -11,6 +11,7 @@ from .const import (
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNKNOWN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,6 +49,13 @@ class EcowittBinarySensor(EcowittEntity, BinarySensorEntity):
                             self._key)
             return None
         return False
+
+    @property
+    def state(self):
+        """Return the state of the binary sensor."""
+        if self.is_on is None:
+            return STATE_UNKNOWN
+        return STATE_ON if self.is_on else STATE_OFF
 
     @property
     def device_class(self):
