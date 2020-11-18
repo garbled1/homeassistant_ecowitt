@@ -16,7 +16,9 @@ from .const import (
 
 from homeassistant.const import (
     STATE_UNKNOWN,
-    DEVICE_CLASS_TIMESTAMP
+    DEVICE_CLASS_TIMESTAMP,
+    DEVICE_CLASS_BATTERY,
+    PERCENTAGE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -58,6 +60,8 @@ class EcowittSensor(EcowittEntity):
                 return dt_util.as_local(
                     dt_util.utc_from_timestamp(self._ws.last_values[self._key])
                 ).isoformat()
+            if self._dc == DEVICE_CLASS_BATTERY and self._uom == PERCENTAGE:
+                return self._ws.last_values[self._key] * 20.0
             return self._ws.last_values[self._key]
         _LOGGER.warning("Sensor %s not in last update, check range or battery",
                         self._key)
