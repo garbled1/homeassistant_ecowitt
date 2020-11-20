@@ -69,6 +69,9 @@ the windunit setting, once you load 0.5, you may find a dead entity for your
 wind gust sensors that were setup for the wrong unit.
 You may delete these.
 
+Once your configuration has been moved, you should delete the old ecowitt
+section from your configuration.yaml file and restart hass.
+
 
 ## How to set up:
 
