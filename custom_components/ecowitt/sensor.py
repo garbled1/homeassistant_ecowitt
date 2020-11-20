@@ -2,47 +2,44 @@
 import logging
 import homeassistant.util.dt as dt_util
 
-from . import (
+from . import EcowittEntity, async_add_ecowitt_entities
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from .const import (
+    DOMAIN,
     TYPE_SENSOR,
-    SENSOR_TYPES,
-    EcowittEntity,
-    DEVICE_CLASS_TIMESTAMP
+    REG_ENTITIES,
+    SIGNAL_ADD_ENTITIES,
 )
 
-from homeassistant.const import STATE_UNKNOWN
+from homeassistant.const import (
+    STATE_UNKNOWN,
+    DEVICE_CLASS_TIMESTAMP,
+    DEVICE_CLASS_BATTERY,
+    PERCENTAGE,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(hass, config, async_add_entities,
-                               discovery_info=None):
-    """Setup a single Ecowitt sensor."""
+async def async_setup_entry(hass, entry, async_add_entities):
+    """Add sensors if new."""
 
-    if not discovery_info:
-        return
+    def add_entities(discovery_info=None):
+        async_add_ecowitt_entities(hass, entry, EcowittSensor,
+                                   SENSOR_DOMAIN, async_add_entities,
+                                   discovery_info)
 
-    entities = []
-    for sensor in discovery_info:
-        name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
-        if kind == TYPE_SENSOR:
-            entities.append(
-                EcowittSensor(
-                    hass,
-                    sensor,
-                    name,
-                    device_class,
-                    uom,
-                    icon,
-                )
-            )
-    async_add_entities(entities, True)
+    signal = f"{SIGNAL_ADD_ENTITIES}_{SENSOR_DOMAIN}"
+    async_dispatcher_connect(hass, signal, add_entities)
+    add_entities(hass.data[DOMAIN][entry.entry_id][REG_ENTITIES][TYPE_SENSOR])
 
 
 class EcowittSensor(EcowittEntity):
 
-    def __init__(self, hass, key, name, dc, uom, icon):
+    def __init__(self, hass, entry, key, name, dc, uom, icon):
         """Initialize the sensor."""
-        super().__init__(hass, key, name)
+        super().__init__(hass, entry, key, name)
         self._icon = icon
         self._uom = uom
         self._dc = dc
@@ -56,6 +53,9 @@ class EcowittSensor(EcowittEntity):
                 return dt_util.as_local(
                     dt_util.utc_from_timestamp(self._ws.last_values[self._key])
                 ).isoformat()
+            # Battery value is 0-5
+            if self._dc == DEVICE_CLASS_BATTERY and self._uom == PERCENTAGE:
+                return self._ws.last_values[self._key] * 20.0
             return self._ws.last_values[self._key]
         _LOGGER.warning("Sensor %s not in last update, check range or battery",
                         self._key)
@@ -72,6 +72,6 @@ class EcowittSensor(EcowittEntity):
         return self._icon
 
     @property
-    def device_info(self):
+    def device_class(self):
         """Return the device class."""
         return self._dc
