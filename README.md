@@ -10,8 +10,15 @@ Ecowitt driver for homeassistant
 Configuration for the Ecowitt integration is now performed via a config flow
 as opposed to yaml configuration file.
 
-In home assistant, you will find it under integrations, search for ecowitt once
-the custom component is installed.
+1. Go to HACS -> Integrations -> Click "+"
+1. Search for "Ecowitt Weather Station" repository and add to HACS
+1. Restart Home Assistant when it says to.
+1. In Home Assistant, go to Configuration -> Integrations -> Click "+ Add Integration"
+1. Search for "Ecowitt Weather Station" and follow the instructions to setup.
+
+Ecowitt should now appear as a card under the HA Integrations page
+with "Options" selection available at the bottom of the card.
+
 You must select the port when enabling, see below section on "How to set up".
 
 There are a few options available once the integration is setup, these are
