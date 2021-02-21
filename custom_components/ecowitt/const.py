@@ -5,6 +5,7 @@ from homeassistant.const import (
     CONF_UNIT_SYSTEM_IMPERIAL,
     DEGREE,
     CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    CONCENTRATION_PARTS_PER_MILLION,
     POWER_WATT,
     TEMP_CELSIUS,
     PERCENTAGE,
@@ -15,6 +16,7 @@ from homeassistant.const import (
     LENGTH_MILES,
     SPEED_KILOMETERS_PER_HOUR,
     SPEED_MILES_PER_HOUR,
+    SPEED_METERS_PER_SECOND,
     TIME_HOURS,
     TIME_DAYS,
     TIME_WEEKS,
@@ -102,6 +104,10 @@ TYPE_WINDSPEEDMPH_A10 = "windspdmph_avg10m"
 TYPE_WINDGUSTMPH = "windgustmph"
 TYPE_MAXDAILYGUST = "maxdailygust"
 TYPE_MAXDAILYGUSTKMH = "maxdailygustkmh"
+TYPE_WINDGUSTMS = "windgustms"
+TYPE_WINDSPEEDMS = "windspeedms"
+TYPE_WINDSPEEDMS_A10 = "windspdms_avg10m"
+TYPE_MAXDAILYGUSTMS = "maxdailygustms"
 TYPE_TEMPC = "tempc"
 TYPE_TEMPINC = "tempinc"
 TYPE_TEMP1C = "temp1c"
@@ -145,6 +151,16 @@ TYPE_LIGHTNING_TIME = "lightning_time"
 TYPE_LIGHTNING_NUM = "lightning_num"
 TYPE_LIGHTNING_KM = "lightning"
 TYPE_LIGHTNING_MI = "lightning_mi"
+TYPE_CO2_TEMP = "tf_co2"
+TYPE_CO2_TEMPC = "tf_co2c"
+TYPE_CO2_HUMIDITY = "humi_co2"
+TYPE_CO2_PM25 = "pm25_co2"
+TYPE_CO2_PM25_AVG_24H = "pm25_24h_co2"
+TYPE_CO2_PM10 = "pm10_co2"
+TYPE_CO2_PM10_AVG_24H = "pm10_24h_co2"
+TYPE_CO2_CO2 = "co2"
+TYPE_CO2_CO2_AVG_24H = "co2_24h"
+TYPE_CO2_BATT = "co2_batt"
 TYPE_LEAK_CH1 = "leak_ch1"
 TYPE_LEAK_CH2 = "leak_ch2"
 TYPE_LEAK_CH3 = "leak_ch3"
@@ -191,14 +207,21 @@ TYPE_LEAKBATT8 = "leakbatt8"
 
 S_METRIC = 1
 S_IMPERIAL = 2
+S_METRIC_MS = 3
 
 W_TYPE_NEW = "new"
 W_TYPE_OLD = "old"
 W_TYPE_HYBRID = "hybrid"
+CONF_UNIT_SYSTEM_METRIC_MS = "metric_ms"
 
 LEAK_DETECTED = "Leak Detected"
 
 UNIT_OPTS = [CONF_UNIT_SYSTEM_METRIC, CONF_UNIT_SYSTEM_IMPERIAL]
+WIND_OPTS = [
+    CONF_UNIT_SYSTEM_METRIC,
+    CONF_UNIT_SYSTEM_IMPERIAL,
+    CONF_UNIT_SYSTEM_METRIC_MS
+]
 WINDCHILL_OPTS = [W_TYPE_HYBRID, W_TYPE_NEW, W_TYPE_OLD]
 
 
@@ -300,6 +323,14 @@ SENSOR_TYPES = {
                         TYPE_SENSOR, None, "mdi:weather-windy", S_IMPERIAL),
     TYPE_MAXDAILYGUSTKMH: ("Max Daily Wind Gust", SPEED_KILOMETERS_PER_HOUR,
                            TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC),
+    TYPE_WINDGUSTMS: ("Wind Gust", SPEED_METERS_PER_SECOND,
+                      TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC_MS),
+    TYPE_WINDSPEEDMS: ("Wind Speed", SPEED_METERS_PER_SECOND,
+                       TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC_MS),
+    TYPE_WINDSPEEDMS_A10: ("Wind Speed", SPEED_METERS_PER_SECOND,
+                           TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC_MS),
+    TYPE_MAXDAILYGUSTMS: ("Max Daily Wind Gust", SPEED_METERS_PER_SECOND,
+                          TYPE_SENSOR, None, "mdi:weather-windy", S_METRIC_MS),
     TYPE_TEMPC: ("Outdoor Temperature", TEMP_CELSIUS,
                  TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
     TYPE_TEMP1C: ("Temperature 1", TEMP_CELSIUS,
@@ -419,6 +450,27 @@ SENSOR_TYPES = {
                     DEVICE_CLASS_MOISTURE, "mdi:leak", 0),
     TYPE_LEAK_CH4: ("Leak Detection 4", LEAK_DETECTED, TYPE_BINARY_SENSOR,
                     DEVICE_CLASS_MOISTURE, "mdi:leak", 0),
+    TYPE_CO2_PM25: ("WH45 PM2.5", CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                    TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_CO2_PM25_AVG_24H: ("WH45 PM2.5 24h average",
+                            CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                            TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_CO2_PM10: ("WH45 PM10", CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                    TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_CO2_PM10_AVG_24H: ("WH45 PM10 24h average",
+                            CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+                            TYPE_SENSOR, None, "mdi:eye", 0),
+    TYPE_CO2_HUMIDITY: ("WH45 Humidity", PERCENTAGE,
+                        TYPE_SENSOR, DEVICE_CLASS_HUMIDITY,
+                        "mdi:water-percent", 0),
+    TYPE_CO2_TEMPC: ("WH45 Temperature", TEMP_CELSIUS,
+                     TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_CO2_CO2: ("WH45 CO2", CONCENTRATION_PARTS_PER_MILLION,
+                   TYPE_SENSOR, None, "mdi:molecule-co2", 0),
+    TYPE_CO2_CO2_AVG_24H: ("WH45 CO2 24h average", CONCENTRATION_PARTS_PER_MILLION,
+                           TYPE_SENSOR, None, "mdi:molecule-co2", 0),
+    TYPE_CO2_BATT: ("WH45 Battery", PERCENTAGE, TYPE_SENSOR,
+                    DEVICE_CLASS_BATTERY, "mdi:battery", 0),
     TYPE_WH25BATT: ("WH25 Battery", "BATT", TYPE_BINARY_SENSOR,
                     DEVICE_CLASS_BATTERY, "mdi:battery", 0),
     TYPE_WH26BATT: ("WH26 Battery", "BATT", TYPE_BINARY_SENSOR,
@@ -510,11 +562,8 @@ IGNORED_SENSORS = [
     'temp6f',
     'temp7f',
     'temp8f',
+    'tf_co2',
     'dateutc',
-    'windgustms',
-    'windspeedms',
-    'windspdms_avg10m',
-    'maxdailygustms',
     'windchillf',
     'dewpointf',
     'dewpointinf',

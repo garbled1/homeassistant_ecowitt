@@ -20,6 +20,7 @@ from .const import (
     DOMAIN,
     W_TYPE_HYBRID,
     UNIT_OPTS,
+    WIND_OPTS,
     WINDCHILL_OPTS
 )
 
@@ -115,7 +116,7 @@ class EcowittOptionsFlowHandler(config_entries.OptionsFlow):
                     default=self.config_entry.options.get(
                         CONF_UNIT_WIND, CONF_UNIT_SYSTEM_IMPERIAL,
                     ),
-                ): vol.In(UNIT_OPTS),
+                ): vol.In(WIND_OPTS),
                 vol.Optional(
                     CONF_UNIT_RAIN,
                     default=self.config_entry.options.get(

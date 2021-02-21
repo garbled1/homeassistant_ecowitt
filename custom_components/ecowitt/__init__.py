@@ -30,6 +30,7 @@ from .const import (
     CONF_UNIT_RAIN,
     CONF_UNIT_WINDCHILL,
     CONF_UNIT_LIGHTNING,
+    CONF_UNIT_SYSTEM_METRIC_MS,
     CONF_NAME,
     DOMAIN,
     DATA_ECOWITT,
@@ -44,6 +45,7 @@ from .const import (
     IGNORED_SENSORS,
     S_IMPERIAL,
     S_METRIC,
+    S_METRIC_MS,
     SENSOR_TYPES,
     TYPE_SENSOR,
     TYPE_BINARY_SENSOR,
@@ -182,10 +184,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 return False
         if "windchill" not in sensor and ("wind" in sensor or "gust" in sensor):
             if (entry.options[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_IMPERIAL
-                    and metric == S_METRIC):
+                    and metric != S_IMPERIAL):
                 return False
             if (entry.options[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC
-                    and metric == S_IMPERIAL):
+                    and metric != S_METRIC):
+                return False
+            if (entry.options[CONF_UNIT_WIND] == CONF_UNIT_SYSTEM_METRIC_MS
+                    and metric != S_METRIC_MS):
                 return False
         if (sensor == 'lightning'
                 and entry.options[CONF_UNIT_LIGHTNING] == CONF_UNIT_SYSTEM_IMPERIAL):
