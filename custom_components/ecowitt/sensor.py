@@ -50,6 +50,8 @@ class EcowittSensor(EcowittEntity):
         if self._key in self._ws.last_values:
             # The lightning time is reported in UTC, hooray.
             if self._dc == DEVICE_CLASS_TIMESTAMP:
+                if not isinstance(self._ws.last_values[self._key], int):
+                    return STATE_UNKNOWN
                 return dt_util.as_local(
                     dt_util.utc_from_timestamp(self._ws.last_values[self._key])
                 ).isoformat()
