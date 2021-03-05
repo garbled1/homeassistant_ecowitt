@@ -168,6 +168,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         """Check if this is the wrong sensor for our config (imp/metric)."""
         # Is this a metric or imperial sensor, lookup and skip
         name, uom, kind, device_class, icon, metric = SENSOR_TYPES[sensor]
+        if metric == 0:
+            return True
         if "baro" in sensor:
             if (entry.options[CONF_UNIT_BARO] == CONF_UNIT_SYSTEM_IMPERIAL
                     and metric == S_METRIC):
