@@ -1,6 +1,7 @@
 {
   "domain": "ecowitt",
   "name": "Ecowitt Weather Station",
+  "version": "0.5",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/ecowitt",
   "requirements": [
