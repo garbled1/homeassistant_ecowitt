@@ -623,6 +623,8 @@ IGNORED_SENSORS = [
     'dewpoint6f',
     'dewpoint7f',
     'dewpoint8f',
+    'mac',
+    'fields',
     DATA_PASSKEY,
     DATA_STATIONTYPE,
     DATA_FREQ,
