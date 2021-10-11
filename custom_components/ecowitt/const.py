@@ -204,6 +204,22 @@ TYPE_LEAKBATT5 = "leakbatt5"
 TYPE_LEAKBATT6 = "leakbatt6"
 TYPE_LEAKBATT7 = "leakbatt7"
 TYPE_LEAKBATT8 = "leakbatt8"
+TYPE_WN34TEMP1C = "tf_ch1"
+TYPE_WN34TEMP2C = "tf_ch2"
+TYPE_WN34TEMP3C = "tf_ch3"
+TYPE_WN34TEMP4C = "tf_ch4"
+TYPE_WN34TEMP5C = "tf_ch5"
+TYPE_WN34TEMP6C = "tf_ch6"
+TYPE_WN34TEMP7C = "tf_ch7"
+TYPE_WN34TEMP8C = "tf_ch8"
+TYPE_WN34BATT1 = "tf_batt1"
+TYPE_WN34BATT2 = "tf_batt2"
+TYPE_WN34BATT3 = "tf_batt3"
+TYPE_WN34BATT4 = "tf_batt4"
+TYPE_WN34BATT5 = "tf_batt5"
+TYPE_WN34BATT6 = "tf_batt6"
+TYPE_WN34BATT7 = "tf_batt7"
+TYPE_WN34BATT8 = "tf_batt8"
 
 S_METRIC = 1
 S_IMPERIAL = 2
@@ -485,22 +501,22 @@ SENSOR_TYPES = {
                     DEVICE_CLASS_BATTERY, "mdi:battery", 0),
     TYPE_WH80BATT: ("WH80 Battery", ELECTRIC_POTENTIAL_VOLT, TYPE_SENSOR,
                     DEVICE_CLASS_BATTERY, "mdi:battery", 0),
-    TYPE_SOILBATT1: ("Soil Moisture 1 Battery", ELECTRIC_POTENTIAL_VOLT, TYPE_SENSOR,
-                     DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
-    TYPE_SOILBATT2: ("Soil Moisture 2 Battery", ELECTRIC_POTENTIAL_VOLT, TYPE_SENSOR,
-                     DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
-    TYPE_SOILBATT3: ("Soil Moisture 3 Battery", ELECTRIC_POTENTIAL_VOLT, TYPE_SENSOR,
-                     DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
-    TYPE_SOILBATT4: ("Soil Moisture 4 Battery", ELECTRIC_POTENTIAL_VOLT, TYPE_SENSOR,
-                     DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
-    TYPE_SOILBATT5: ("Soil Moisture 5 Battery", ELECTRIC_POTENTIAL_VOLT, TYPE_SENSOR,
-                     DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
-    TYPE_SOILBATT6: ("Soil Moisture 6 Battery", ELECTRIC_POTENTIAL_VOLT, TYPE_SENSOR,
-                     DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
-    TYPE_SOILBATT7: ("Soil Moisture 7 Battery", ELECTRIC_POTENTIAL_VOLT, TYPE_SENSOR,
-                     DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
-    TYPE_SOILBATT8: ("Soil Moisture 8 Battery", ELECTRIC_POTENTIAL_VOLT, TYPE_SENSOR,
-                     DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_SOILBATT1: ("Soil Moisture 1 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_SOILBATT2: ("Soil Moisture 2 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_SOILBATT3: ("Soil Moisture 3 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_SOILBATT4: ("Soil Moisture 4 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_SOILBATT5: ("Soil Moisture 5 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_SOILBATT6: ("Soil Moisture 6 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_SOILBATT7: ("Soil Moisture 7 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_SOILBATT8: ("Soil Moisture 8 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
     TYPE_BATTERY1: ("Battery 1", "BATT", TYPE_BINARY_SENSOR,
                     DEVICE_CLASS_BATTERY, "mdi:battery", 0),
     TYPE_BATTERY2: ("Battery 2", "BATT", TYPE_BINARY_SENSOR,
@@ -549,6 +565,38 @@ SENSOR_TYPES = {
                      DEVICE_CLASS_BATTERY, "mdi:battery", 0),
     TYPE_LEAKBATT8: ("Leak 8 Battery", PERCENTAGE, TYPE_SENSOR,
                      DEVICE_CLASS_BATTERY, "mdi:battery", 0),
+    TYPE_WN34TEMP1C: ("Soil Temperature 1", TEMP_CELSIUS,
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_WN34TEMP2C: ("Soil Temperature 2", TEMP_CELSIUS,
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_WN34TEMP3C: ("Soil Temperature 3", TEMP_CELSIUS,
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_WN34TEMP4C: ("Soil Temperature 4", TEMP_CELSIUS,
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_WN34TEMP5C: ("Soil Temperature 5", TEMP_CELSIUS,
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_WN34TEMP6C: ("Soil Temperature 6", TEMP_CELSIUS,
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_WN34TEMP7C: ("Soil Temperature 7", TEMP_CELSIUS,
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_WN34TEMP8C: ("Soil Temperature 8", TEMP_CELSIUS,
+                      TYPE_SENSOR, DEVICE_CLASS_TEMPERATURE, "mdi:thermometer", 0),
+    TYPE_WN34BATT1: ("Soil Temperature 1 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_WN34BATT2: ("Soil Temperature 2 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_WN34BATT3: ("Soil Temperature 3 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_WN34BATT4: ("Soil Temperature 4 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_WN34BATT5: ("Soil Temperature 5 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_WN34BATT6: ("Soil Temperature 6 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_WN34BATT7: ("Soil Temperature 7 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
+    TYPE_WN34BATT8: ("Soil Temperature 8 Battery", ELECTRIC_POTENTIAL_VOLT,
+                     TYPE_SENSOR, DEVICE_CLASS_VOLTAGE, "mdi:battery", 0),
 }
 
 IGNORED_SENSORS = [
