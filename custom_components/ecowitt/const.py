@@ -61,6 +61,7 @@ REG_ENTITIES = "registered"
 DEFAULT_PORT = 4199
 
 SIGNAL_ADD_ENTITIES = "ecowitt_add_entities"
+SIGNAL_REMOVE_ENTITIES = "ecowitt_remove_entities"
 
 CONF_NAME = "component_name"
 CONF_UNIT_BARO = "barounit"
