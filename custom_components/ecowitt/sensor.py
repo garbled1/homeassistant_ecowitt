@@ -4,6 +4,7 @@ import homeassistant.util.dt as dt_util
 
 from . import EcowittEntity, async_add_ecowitt_entities
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from .const import (
     DOMAIN,
@@ -35,7 +36,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     add_entities(hass.data[DOMAIN][entry.entry_id][REG_ENTITIES][TYPE_SENSOR])
 
 
-class EcowittSensor(EcowittEntity):
+class EcowittSensor(EcowittEntity, SensorEntity):
 
     def __init__(self, hass, entry, key, name, dc, uom, icon, sc):
         """Initialize the sensor."""
