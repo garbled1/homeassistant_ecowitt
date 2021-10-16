@@ -204,14 +204,14 @@ TYPE_LEAKBATT5 = "leakbatt5"
 TYPE_LEAKBATT6 = "leakbatt6"
 TYPE_LEAKBATT7 = "leakbatt7"
 TYPE_LEAKBATT8 = "leakbatt8"
-TYPE_WN34TEMP1C = "tf_ch1"
-TYPE_WN34TEMP2C = "tf_ch2"
-TYPE_WN34TEMP3C = "tf_ch3"
-TYPE_WN34TEMP4C = "tf_ch4"
-TYPE_WN34TEMP5C = "tf_ch5"
-TYPE_WN34TEMP6C = "tf_ch6"
-TYPE_WN34TEMP7C = "tf_ch7"
-TYPE_WN34TEMP8C = "tf_ch8"
+TYPE_WN34TEMP1C = "tf_ch1c"
+TYPE_WN34TEMP2C = "tf_ch2c"
+TYPE_WN34TEMP3C = "tf_ch3c"
+TYPE_WN34TEMP4C = "tf_ch4c"
+TYPE_WN34TEMP5C = "tf_ch5c"
+TYPE_WN34TEMP6C = "tf_ch6c"
+TYPE_WN34TEMP7C = "tf_ch7c"
+TYPE_WN34TEMP8C = "tf_ch8c"
 TYPE_WN34BATT1 = "tf_batt1"
 TYPE_WN34BATT2 = "tf_batt2"
 TYPE_WN34BATT3 = "tf_batt3"
@@ -611,6 +611,14 @@ IGNORED_SENSORS = [
     'temp7f',
     'temp8f',
     'tf_co2',
+    'tf_ch1',
+    'tf_ch2',
+    'tf_ch3',
+    'tf_ch4',
+    'tf_ch5',
+    'tf_ch6',
+    'tf_ch7',
+    'tf_ch8',
     'dateutc',
     'windchillf',
     'dewpointf',
