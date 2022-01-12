@@ -11,10 +11,19 @@ Configuration for the Ecowitt integration is now performed via a config flow
 as opposed to yaml configuration file.
 
 1. Go to HACS -> Integrations -> Click "+"
-1. Search for "Ecowitt Weather Station" repository and add to HACS
-1. Restart Home Assistant when it says to.
-1. In Home Assistant, go to Configuration -> Integrations -> Click "+ Add Integration"
-1. Search for "Ecowitt Weather Station" and follow the instructions to setup.
+2. 3. Search for "Ecowitt Weather Station" repository and add to HACS
+4. Restart Home Assistant when it says to.
+5. Add this snippet to your configuration.yaml
+```
+ecowitt:
+  port: 4199
+  barounit: metric
+  windunit: imperial
+  rainunit: imperial
+  windchillunit: hybrid
+```
+6. In Home Assistant, go to Configuration -> Integrations -> Click "+ Add Integration"
+7. Search for "Ecowitt Weather Station" and follow the instructions to setup.
 
 Ecowitt should now appear as a card under the HA Integrations page
 with "Options" selection available at the bottom of the card.
