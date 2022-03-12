@@ -55,8 +55,7 @@ class EcowittSensor(EcowittEntity, SensorEntity):
                 if not isinstance(self._ws.last_values[self._key], int):
                     return STATE_UNKNOWN
                 return dt_util.as_local(
-                    dt_util.utc_from_timestamp(self._ws.last_values[self._key])
-                ).isoformat()
+                    dt_util.utc_from_timestamp(self._ws.last_values[self._key]))
             # Battery value is 0-5
             if self._dc == DEVICE_CLASS_BATTERY and self._uom == PERCENTAGE:
                 return self._ws.last_values[self._key] * 20.0
