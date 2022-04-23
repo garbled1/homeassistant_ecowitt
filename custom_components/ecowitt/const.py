@@ -226,6 +226,23 @@ TYPE_WN34BATT5 = "tf_batt5"
 TYPE_WN34BATT6 = "tf_batt6"
 TYPE_WN34BATT7 = "tf_batt7"
 TYPE_WN34BATT8 = "tf_batt8"
+TYPE_WH90BATT = "wh90batt"
+TYPE_WH90BATT_PC = "wh90battpc"
+TYPE_WH90CAP_VOLT = "ws90cap_volt"
+TYPE_RAINRATE_PIEZO_IN = "rrain_piezo"
+TYPE_EVENTRAIN_PIEZO_IN = "erain_piezo"
+TYPE_HOURLYRAIN_PIEZO_IN = "hrain_piezo"
+TYPE_DAILYRAIN_PIEZO_IN = "drain_piezo"
+TYPE_WEEKLYRAIN_PIEZO_IN = "wrain_piezo"
+TYPE_MONTHLYRAIN_PIEZO_IN = "mrain_piezo"
+TYPE_YEARLYRAIN_PIEZO_IN = "yrain_piezo"
+TYPE_RAINRATE_PIEZO_MM = "rrain_piezomm"
+TYPE_EVENTRAIN_PIEZO_MM = "erain_piezomm"
+TYPE_HOURLYRAIN_PIEZO_MM = "hrain_piezomm"
+TYPE_DAILYRAIN_PIEZO_MM = "drain_piezomm"
+TYPE_WEEKLYRAIN_PIEZO_MM = "wrain_piezomm"
+TYPE_MONTHLYRAIN_PIEZO_MM = "mrain_piezomm"
+TYPE_YEARLYRAIN_PIEZO_MM = "yrain_piezomm"
 
 S_METRIC = 1
 S_IMPERIAL = 2
@@ -245,7 +262,6 @@ WIND_OPTS = [
     CONF_UNIT_SYSTEM_METRIC_MS
 ]
 WINDCHILL_OPTS = [W_TYPE_HYBRID, W_TYPE_NEW, W_TYPE_OLD]
-
 
 # Name, unit_of_measure, type, device_class, icon, metric=1, state_class
 # name, uom, kind, device_class, icon, metric, state_class = SENSOR_TYPES[x]
@@ -698,6 +714,57 @@ SENSOR_TYPES = {
     TYPE_WN34BATT8: ("Soil Temperature 8 Battery", ELECTRIC_POTENTIAL_VOLT,
                      TYPE_SENSOR, DEVICE_CLASS_VOLTAGE,
                      "mdi:battery", 0, STATE_CLASS_MEASUREMENT),
+    TYPE_WH90BATT_PC: ("WH90 Battery Percentage", None, TYPE_SENSOR,
+                       DEVICE_CLASS_BATTERY, "mdi:battery", 0,
+                       STATE_CLASS_MEASUREMENT),
+    TYPE_WH90BATT: ("WH90 Battery", ELECTRIC_POTENTIAL_VOLT, TYPE_SENSOR,
+                    DEVICE_CLASS_VOLTAGE, "mdi:battery", 0,
+                    STATE_CLASS_MEASUREMENT),
+    TYPE_WH90CAP_VOLT: ("WH90 Capacitor", ELECTRIC_POTENTIAL_VOLT, TYPE_SENSOR,
+                        DEVICE_CLASS_VOLTAGE, "mdi:battery", 0,
+                        STATE_CLASS_MEASUREMENT),
+    TYPE_RAINRATE_PIEZO_IN: ("Rain Rate Piezo", f"{LENGTH_INCHES}/{TIME_HOURS}",
+                             TYPE_SENSOR, None, "mdi:water", S_IMPERIAL,
+                             STATE_CLASS_TOTAL_INCREASING),
+    TYPE_EVENTRAIN_PIEZO_IN: ("Event Rain Rate Piezo", f"{LENGTH_INCHES}/{TIME_HOURS}",
+                              TYPE_SENSOR, None, "mdi:water", S_IMPERIAL,
+                              STATE_CLASS_TOTAL_INCREASING),
+    TYPE_HOURLYRAIN_PIEZO_IN: ("Hourly Rain Rate Piezo", f"{LENGTH_INCHES}/{TIME_HOURS}",
+                               TYPE_SENSOR, None, "mdi:water", S_IMPERIAL,
+                               STATE_CLASS_TOTAL_INCREASING),
+    TYPE_DAILYRAIN_PIEZO_IN: ("Daily Rain Rate Piezo", f"{LENGTH_INCHES}/{TIME_DAYS}",
+                              TYPE_SENSOR, None, "mdi:water", S_IMPERIAL,
+                              STATE_CLASS_TOTAL_INCREASING),
+    TYPE_WEEKLYRAIN_PIEZO_IN: ("Weekly Rain Rate Piezo", f"{LENGTH_INCHES}/{TIME_WEEKS}",
+                               TYPE_SENSOR, None, "mdi:water", S_IMPERIAL,
+                               STATE_CLASS_TOTAL_INCREASING),
+    TYPE_MONTHLYRAIN_PIEZO_IN: ("Monthly Rain Rate Piezo", f"{LENGTH_INCHES}/{TIME_MONTHS}",
+                                TYPE_SENSOR, None, "mdi:water", S_IMPERIAL,
+                                STATE_CLASS_TOTAL_INCREASING),
+    TYPE_YEARLYRAIN_PIEZO_IN: ("Yearly Rain Rate Piezo", f"{LENGTH_INCHES}/{TIME_YEARS}",
+                               TYPE_SENSOR, None, "mdi:water", S_IMPERIAL,
+                               STATE_CLASS_TOTAL_INCREASING),
+    TYPE_RAINRATE_PIEZO_MM: ("Rain Rate Piezo", f"mm/{TIME_HOURS}",
+                             TYPE_SENSOR, None, "mdi:water", S_METRIC,
+                             STATE_CLASS_TOTAL_INCREASING),
+    TYPE_EVENTRAIN_PIEZO_MM: ("Event Rain Rate Piezo", f"mm/{TIME_HOURS}",
+                              TYPE_SENSOR, None, "mdi:water", S_METRIC,
+                              STATE_CLASS_TOTAL_INCREASING),
+    TYPE_HOURLYRAIN_PIEZO_MM: ("Hourly Rain Rate Piezo", f"mm/{TIME_HOURS}",
+                               TYPE_SENSOR, None, "mdi:water", S_METRIC,
+                               STATE_CLASS_TOTAL_INCREASING),
+    TYPE_DAILYRAIN_PIEZO_MM: ("Daily Rain Rate Piezo", f"mm/{TIME_DAYS}",
+                              TYPE_SENSOR, None, "mdi:water", S_METRIC,
+                              STATE_CLASS_TOTAL_INCREASING),
+    TYPE_WEEKLYRAIN_PIEZO_MM: ("Weekly Rain Rate Piezo", f"mm/{TIME_WEEKS}",
+                               TYPE_SENSOR, None, "mdi:water", S_METRIC,
+                               STATE_CLASS_TOTAL_INCREASING),
+    TYPE_MONTHLYRAIN_PIEZO_MM: ("Monthly Rain Rate Piezo", f"mm/{TIME_MONTHS}",
+                                TYPE_SENSOR, None, "mdi:water", S_METRIC,
+                                STATE_CLASS_TOTAL_INCREASING),
+    TYPE_YEARLYRAIN_PIEZO_MM: ("Yearly Rain Rate Piezo", f"mm/{TIME_YEARS}",
+                               TYPE_SENSOR, None, "mdi:water", S_METRIC,
+                               STATE_CLASS_TOTAL_INCREASING),
 }
 
 IGNORED_SENSORS = [
@@ -734,6 +801,8 @@ IGNORED_SENSORS = [
     'dewpoint8f',
     'mac',
     'fields',
+    'runtime',
+    'ws90_ver',
     DATA_PASSKEY,
     DATA_STATIONTYPE,
     DATA_FREQ,
