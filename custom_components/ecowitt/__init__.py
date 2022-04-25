@@ -210,7 +210,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         """Check the sensor for validity, and append to new entitiy list."""
         if sensor not in SENSOR_TYPES:
             if sensor not in IGNORED_SENSORS:
-                _LOGGER.warning("Unhandled sensor type %s", sensor)
+                _LOGGER.warning("Unhandled sensor type \"%s\"", sensor)
             return None
 
         # Is this a metric or imperial sensor, lookup and skip
@@ -271,13 +271,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         for sensor in weather_data.keys():
             if sensor not in SENSOR_TYPES:
                 if sensor not in IGNORED_SENSORS:
-                    _LOGGER.warning("Unhandled sensor type %s value %s, "
+                    _LOGGER.warning("Unhandled sensor type \"%s\", value: \"%s\", "
                                     + "file a PR.", sensor, weather_data[sensor])
             elif (sensor not in ecowitt_data[REG_ENTITIES][TYPE_SENSOR]
                   and sensor not in ecowitt_data[REG_ENTITIES][TYPE_BINARY_SENSOR]
                   and sensor not in IGNORED_SENSORS
                   and check_imp_metric_sensor(sensor)):
-                _LOGGER.warning("Unregistered sensor type %s value %s received.",
+                _LOGGER.warning("Unregistered sensor type \"%s\" value \"%s\" received.",
                                 sensor, weather_data[sensor])
                 # try to register the sensor
                 kind = check_and_append_sensor(sensor)
@@ -288,7 +288,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                    or sensor in ecowitt_data[REG_ENTITIES][TYPE_BINARY_SENSOR])
                   and sensor not in IGNORED_SENSORS
                   and not check_imp_metric_sensor(sensor)):
-                _LOGGER.warning("Removing sensor type %S.", sensor)
+                _LOGGER.warning("Removing sensor type \"%S\".", sensor)
                 old_sensors.append(sensor)
 
         # If we have old sensors, delete them.
