@@ -2,9 +2,10 @@
 import logging
 import homeassistant.util.dt as dt_util
 
+from datetime import datetime
 from . import EcowittEntity, async_add_ecowitt_entities
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from .const import (
     DOMAIN,
@@ -15,8 +16,6 @@ from .const import (
 
 from homeassistant.const import (
     STATE_UNKNOWN,
-    DEVICE_CLASS_TIMESTAMP,
-    DEVICE_CLASS_BATTERY,
     PERCENTAGE,
 )
 
@@ -51,14 +50,16 @@ class EcowittSensor(EcowittEntity, SensorEntity):
         """Return the state of the sensor."""
         if self._key in self._ws.last_values:
             # The lightning time is reported in UTC, hooray.
-            if self._dc == DEVICE_CLASS_TIMESTAMP:
+            if self._dc == SensorDeviceClass.TIMESTAMP:
                 if not isinstance(self._ws.last_values[self._key], int):
                     return STATE_UNKNOWN
-                return dt_util.as_local(
-                    dt_util.utc_from_timestamp(self._ws.last_values[self._key])
-                ).isoformat()
+                return datetime.strptime(
+                    dt_util.as_local(
+                        dt_util.utc_from_timestamp(self._ws.last_values[self._key])
+                    ).isoformat(), "%Y-%m-%dT%H:%M:%S%z"
+                )
             # Battery value is 0-5
-            if self._dc == DEVICE_CLASS_BATTERY and self._uom == PERCENTAGE:
+            if self._dc == SensorDeviceClass.BATTERY and self._uom == PERCENTAGE:
                 return self._ws.last_values[self._key] * 20.0
             return self._ws.last_values[self._key]
         _LOGGER.warning("Sensor %s not in last update, check range or battery",
