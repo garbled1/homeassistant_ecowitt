@@ -1,0 +1,34 @@
+{
+    "config": {
+	"title": "Ecowitt Wetterstation",
+	"abort": {
+	    "already_configured": "Das Gerät ist bereits konfiguriert.",
+	    "unknown": "Unbekannter Fehler."
+	},
+	"step": {
+	    "user": {
+		"description": "Die folgenden Schritte müssen durchgeführt werden, bevor Sie diese Integration einrichten.\nWenn Sie dies noch nicht getan haben, tun Sie es bitte jetzt.\n\nÖffnen Sie auf Ihrem Smartphone die WS View-App und verbinden Sie sich mit Ihrem Ecowitt-Gerät.\nWählen Sie Menü -> Geräteliste -> Wählen Sie Ihre Station aus.\nKlicken Sie wiederholt auf 'Weiter', um zur letzten Ansicht mit der Überschrift „Customized“ zu gelangen.\n\nWählen Sie das Protokoll Ecowitt aus und geben Sie den IP/Hostnamen Ihres Home Assistant Servers ein.\nDer Pfad spielt keine Rolle, solange er mit / endet. Sie können dabei entweder die Voreinstellung belassen oder einfach ein / eingeben.\nWählen Sie einen Port, der auf dem Server nicht verwendet wird (netstat -lt). Als guter Standardwert bietet sich dafür Port 4199 an.\nWählen Sie einen vernünftigen Wert für die Aktualisierungen, z. B. 60 Sekunden.\nSpeichern Sie die Konfiguration. Ihre Ecowitt Wetterstation sollte nun versuchen, Daten an Ihren Server zu senden.\n\nKlicken Sie auf 'Bestätigen' ('Submit'), wenn Sie diese Anweisungen ausgeführt haben.",
+		"title": "Anleitung zur Einrichtung der Ecowitt Wetterstation."
+	    },
+	    "initial_options": {
+		"title": "Ecowitt Parameter",
+		"data": {
+		    "port": "Listening-Port"
+		}
+	    }
+	}
+    },
+    "options": {
+	"step": {
+	    "init": {
+		"data": {
+		    "barounit": "Einheit Barometer",
+		    "windunit": "Einheit Wind",
+		    "rainunit": "Einheit Niederschlag",
+		    "lightningunit": "Einheit für Blitzentfernung",
+		    "windchillunit": "Windchill Berechnung"
+		}
+	    }
+	}
+    }
+}
