@@ -18,7 +18,7 @@ from homeassistant.helpers.dispatcher import (
 )
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_registry import (
-    async_get_registry as async_get_entity_registry,
+    async_get as async_get_entity_registry,
 )
 
 from homeassistant.const import (
