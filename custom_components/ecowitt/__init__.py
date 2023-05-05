@@ -18,7 +18,7 @@ from homeassistant.helpers.dispatcher import (
 )
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_registry import (
-    async_get_registry as async_get_entity_registry,
+    async_get as async_get_entity_registry,
 )
 
 from homeassistant.const import (
@@ -418,7 +418,7 @@ class EcowittEntity(Entity):
 
         if self._key in discovery_info.keys():
 
-            registry = await async_get_entity_registry(self.hass)
+            registry = async_get_entity_registry(self.hass)
 
             entity_id = registry.async_get_entity_id(
                 discovery_info[self._key], DOMAIN, self.unique_id
